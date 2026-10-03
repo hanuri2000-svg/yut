@@ -1,0 +1,82 @@
+name: Add final ranking strip
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/add-final-ranking.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch ranking display
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path("index.html")
+          s=p.read_text(encoding="utf-8")
+
+          # Version bump
+          s=s.replace("v2026.10.03.7","v2026.10.03.8")
+          s=s.replace("2026.10.03.7","2026.10.03.8")
+
+          css = '''<style id="final-ranking-style">
+.final-ranking{
+  position:absolute;left:50%;bottom:12px;transform:translateX(-50%);
+  z-index:26;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  width:720px;pointer-events:none;
+}
+.rank-card{
+  height:38px;border:1px solid rgba(225,215,236,.44);border-radius:8px;
+  background:rgba(16,13,24,.92);display:flex;align-items:center;justify-content:center;
+  gap:8px;padding:0 10px;color:#fff;font-size:14px;font-weight:950;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rank-card .rank-label{font-size:13px;opacity:.96}
+.rank-card .rank-team{overflow:hidden;text-overflow:ellipsis}
+.rank-1{border-color:#d7b56d}
+.rank-2{border-color:#b9b9c9}
+.rank-3{border-color:#b57a55}
+</style>'''
+          if 'id="final-ranking-style"' not in s:
+              s=s.replace('</head>', css+'\n</head>')
+
+          markup = '''<div class="final-ranking" id="finalRanking">
+  <div class="rank-card rank-1"><span class="rank-label">1위</span><span class="rank-team" id="rank1Team">-</span></div>
+  <div class="rank-card rank-2"><span class="rank-label">2위</span><span class="rank-team" id="rank2Team">-</span></div>
+  <div class="rank-card rank-3"><span class="rank-label">3위</span><span class="rank-team" id="rank3Team">-</span></div>
+</div>'''
+          if 'id="finalRanking"' not in s:
+              marker='<div class="board-version">'
+              if marker in s:
+                  s=s.replace(marker, markup+'\n        '+marker, 1)
+              else:
+                  s=s.replace('</div>\n    </div>\n    <div class="note">', markup+'\n      </div>\n    </div>\n    <div class="note">', 1)
+
+          # Inject ranking update in renderBroadcast immediately before active-line rendering.
+          rank_js = """const finalTeams=match('FINAL');
+ const finalWinner=started ? (results.FINAL||'') : '';
+ const secondPlace=started && finalWinner && finalTeams[0] && finalTeams[1] ? (finalWinner===finalTeams[0]?finalTeams[1]:finalTeams[0]) : '';
+ document.getElementById('rank1Team').textContent=finalWinner||'-';
+ document.getElementById('rank2Team').textContent=secondPlace||'-';
+ document.getElementById('rank3Team').textContent=(started ? (results.THIRD||'') : '')||'-';
+ """
+          target=" const act=activeSet();Object.entries(lines).forEach(([id,p])=>p.classList.toggle('on',act.has(id)));"
+          if "rank1Team" in s and "const secondPlace=" not in s and target in s:
+              s=s.replace(target, " "+rank_js+target, 1)
+
+          p.write_text(s,encoding="utf-8")
+          PY
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Add bottom 1st 2nd 3rd ranking strip"
+          git push
