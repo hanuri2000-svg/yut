@@ -1,0 +1,36 @@
+name: Remove live purple lines
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/remove-live-lines.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Remove live purple line overlay
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path("index.html")
+          s = p.read_text(encoding="utf-8")
+          if '<style id="disable-live-lines">' not in s:
+              s = s.replace('</head>', '<style id="disable-live-lines">.live-svg{display:none!important}</style>\n</head>')
+          s = s.replace('v2026.10.03.5', 'v2026.10.03.6')
+          s = s.replace("const APP_VERSION='2026.10.03.5';", "const APP_VERSION='2026.10.03.6';")
+          p.write_text(s, encoding="utf-8")
+
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Remove live purple line overlay" || exit 0
+          git push
