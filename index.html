@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">\n<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n<meta http-equiv="Pragma" content="no-cache">\n<meta http-equiv="Expires" content="0">\n<meta name="app-version" content="2026.10.03.5">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>NEWCATSLE × 뉴엔터 윷놀이 대진표 v2026.10.03.7</title>
+<title>NEWCATSLE × 뉴엔터 윷놀이 대진표 v2026.10.03.8</title>
 <style>
 :root{--bg:#0b0910;--panel:#15111f;--border:#43384d;--purple:#b16cff;--text:#f7f2fb;--muted:#a99db5}
 *{box-sizing:border-box}
@@ -61,7 +61,7 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
 @media(max-width:760px){.setup-grid,.control-grid,.picker-grid{grid-template-columns:1fr 1fr} .app{padding:8px}}
 </style>
 <style id="disable-live-lines">.live-svg{display:none!important}</style>
-<style id="third-place-highlight">#ov-TL.win,#ov-TR.win{color:#ffe6a3!important;font-weight:1000!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important}#ov-TL.lose,#ov-TR.lose{opacity:.25!important}</style></head>
+<style id="third-place-highlight">#ov-TL.win,#ov-TR.win{color:#ffe6a3!important;font-weight:1000!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important}#ov-TL.lose,#ov-TR.lose{opacity:.25!important}</style><style id="final-ranking-style">.final-ranking{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:26;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:720px;pointer-events:none}.rank-card{height:38px;border:1px solid rgba(225,215,236,.44);border-radius:8px;background:rgba(16,13,24,.92);display:flex;align-items:center;justify-content:center;gap:8px;padding:0 10px;color:#fff;font-size:14px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rank-card .rank-label{font-size:13px;opacity:.96}.rank-card .rank-team{overflow:hidden;text-overflow:ellipsis}.rank-1{border-color:#d7b56d}.rank-2{border-color:#b9b9c9}.rank-3{border-color:#b57a55}</style></head>
 <body>
 <div class="app">
   <div class="tabs">
@@ -77,7 +77,7 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
           <div class="hint">팀칸을 눌러 16개 팀 중에서 선택하고 대진을 맞춘 뒤 시작을 눌러.</div>
         </div>
         <div style="text-align:right">
-          <div class="version">버전 v2026.10.03.7</div>
+          <div class="version">버전 v2026.10.03.8</div>
           <div class="actions" style="justify-content:flex-end;margin-top:6px">
             <button class="btn primary" id="startBtn" type="button">시작</button>
             <button class="btn" id="resetBtn" type="button">초기화</button>
@@ -101,7 +101,7 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
           <div class="hint">경기 끝난 순서대로 이긴 팀만 눌러.</div>
         </div>
         <div style="text-align:right">
-          <div class="version">버전 v2026.10.03.7</div>
+          <div class="version">버전 v2026.10.03.8</div>
           <div id="controlProgress" style="font-weight:1000;margin-top:6px">16강 결과 0 / 8 완료</div>
         </div>
       </div>
@@ -117,7 +117,7 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
     <div class="broadcast-scroll">
       <div class="board" id="board">
         <svg class="live-svg" viewBox="0 0 1536 864" id="liveSvg"></svg>
-        <div class="board-version">v2026.10.03.7</div>
+        <div class="final-ranking" id="finalRanking"><div class="rank-card rank-1"><span class="rank-label">1위</span><span class="rank-team" id="rank1Team">-</span></div><div class="rank-card rank-2"><span class="rank-label">2위</span><span class="rank-team" id="rank2Team">-</span></div><div class="rank-card rank-3"><span class="rank-label">3위</span><span class="rank-team" id="rank3Team">-</span></div></div><div class="board-version">v2026.10.03.8</div>
       </div>
     </div>
     <div class="note">시작 전에는 방송화면 칸을 비워 두고, 시작 후에만 16강 팀명이 표시되게 수정한 버전이야.</div>
@@ -126,7 +126,7 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
 
 <script>
 (()=>{
-const APP_VERSION='2026.10.03.7';
+const APP_VERSION='2026.10.03.8';
 const defaults=['트슈 · 단솔','니코 · 하윤','듀듀 · 미스','냥코 · 으니','뉴다 · 복실','도랑 · 재욱','아송 · 쫑알','막현 · 퀸주','아깽 · 대휘','키링 · 갑숙','봉구 · 빵지니','난강 · 밍또','유즈 · 성균','건욱 · 키키','액구 · 유성','두링 · 성준'];
 const STORAGE_KEY='nc_yut_v5';
 let teams=[...defaults], results={}, history=[], started=false, pickerIndex=null;
@@ -325,7 +325,7 @@ function renderBroadcast(){
  overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]); overlays.TL.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[0] && !!th[0]); overlays.TR.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[1] && !!th[1]);
  const n=Object.keys(results).filter(k=>k.startsWith('L16_')||k.startsWith('R16_')).length;
  overlays.PROG.textContent=`결과 ${n} / 8 완료`;
- const act=activeSet();Object.entries(lines).forEach(([id,p])=>p.classList.toggle('on',act.has(id)));
+ const finalTeams=match('FINAL'); const finalWinner=started ? (results.FINAL||'') : ''; const secondPlace=started && finalWinner && finalTeams[0] && finalTeams[1] ? (finalWinner===finalTeams[0]?finalTeams[1]:finalTeams[0]) : ''; document.getElementById('rank1Team').textContent=finalWinner||'-'; document.getElementById('rank2Team').textContent=secondPlace||'-'; document.getElementById('rank3Team').textContent=(started ? (results.THIRD||'') : '')||'-'; const act=activeSet();Object.entries(lines).forEach(([id,p])=>p.classList.toggle('on',act.has(id)));
 }
 function renderAll(){renderControl();renderBroadcast();}
 
