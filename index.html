@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">\n<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n<meta http-equiv="Pragma" content="no-cache">\n<meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n<meta name="app-version" content="2026.10.03.2">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n<meta name="app-version" content="2026.10.03.3">
 <title>NEWCATSLE × 뉴엔터 윷놀이 테스트 v3</title>
 <style>
 :root{--bg:#08070d;--panel:#15111f;--border:#43384d;--purple:#b16cff;--text:#f7f2fb;--muted:#a99db5}
@@ -61,7 +61,7 @@ button{touch-action:manipulation}
 .ov.small{font-size:15px;color:#ddd3e6;text-shadow:0 2px 3px #000,0 0 5px #000}
 .ov.win{background:rgba(119,61,170,.28);box-shadow:inset 0 0 0 1px rgba(177,108,255,.5),0 0 12px rgba(177,108,255,.35);color:#fff}
 .ov.lose{opacity:.34}
-.ov.progress{background:rgba(20,16,30,.96);font-size:17px;border-radius:0}
+.ov.progress{background:rgba(20,16,30,.92);font-size:17px;border-radius:0}
 .ov.champion{background:transparent;font-size:25px;color:#fff3cf;text-shadow:0 2px 4px #000,0 0 8px rgba(255,230,150,.35)}
 .live-svg{position:absolute;inset:0;width:1536px;height:864px;z-index:18;pointer-events:none}
 .live-line{fill:none;stroke:transparent;stroke-width:7;filter:drop-shadow(0 0 6px #b16cff)}
@@ -284,14 +284,14 @@ line('R4a','M 976 375 H 939 V 476 H 1014'); line('R4b','M 976 612 H 939 V 476 H 
 function teamFor(id){
  if(/^L\d$/.test(id))return teams[+id.slice(1)];
  if(/^R\d$/.test(id))return teams[8+(+id.slice(1))];
- if(/^LQ\d$/.test(id))return results['L16_'+(+id.slice(2))]||'승자';
- if(/^RQ\d$/.test(id))return results['R16_'+(+id.slice(2))]||'승자';
- if(id==='LS0')return results.L8_0||'승자';
- if(id==='LS1')return results.L8_1||'승자';
- if(id==='RS0')return results.R8_0||'승자';
- if(id==='RS1')return results.R8_1||'승자';
- if(id==='LF')return results.L4||'승자';
- if(id==='RF')return results.R4||'승자';
+ if(/^LQ\d$/.test(id))return results['L16_'+(+id.slice(2))]||'';
+ if(/^RQ\d$/.test(id))return results['R16_'+(+id.slice(2))]||'';
+ if(id==='LS0')return results.L8_0||'';
+ if(id==='LS1')return results.L8_1||'';
+ if(id==='RS0')return results.R8_0||'';
+ if(id==='RS1')return results.R8_1||'';
+ if(id==='LF')return results.L4||'';
+ if(id==='RF')return results.R4||'';
  return'';
 }
 function keyFor(id){
@@ -329,7 +329,7 @@ function renderBroadcast(){
  if(results.L4)overlays.LF.classList.add('win'); if(results.R4)overlays.RF.classList.add('win');
 
  overlays.CHAMP.textContent=results.FINAL||'';
- const th=match('THIRD'); overlays.TL.textContent=th[0]||'승자'; overlays.TR.textContent=th[1]||'승자';
+ const th=match('THIRD'); overlays.TL.textContent=th[0]||''; overlays.TR.textContent=th[1]||'';
  overlays.TL.classList.toggle('win',results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',results.THIRD===th[1]&&!!th[1]);
 
  const n=Object.keys(results).filter(k=>k.startsWith('L16_')||k.startsWith('R16_')).length;
