@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">\n<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n<meta http-equiv="Pragma" content="no-cache">\n<meta http-equiv="Expires" content="0">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n<meta name="app-version" content="2026.10.03.1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n<meta name="app-version" content="2026.10.03.2">
 <title>NEWCATSLE × 뉴엔터 윷놀이 테스트 v3</title>
 <style>
 :root{--bg:#08070d;--panel:#15111f;--border:#43384d;--purple:#b16cff;--text:#f7f2fb;--muted:#a99db5}
@@ -24,8 +24,17 @@ button{touch-action:manipulation}
 .setup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
 .setup{border:1px solid var(--border);border-radius:12px;background:#100d17;padding:10px}
 .setup b{display:block;font-size:12px;margin-bottom:7px}
-.setup input{width:100%;min-height:44px;border:1px solid var(--border);border-radius:9px;background:#0d0b12;color:#fff;padding:0 10px;font-size:16px}
-.setup input+input{margin-top:7px}
+.setup-slot{width:100%;min-height:46px;border:1px solid var(--border);border-radius:9px;background:#18131f;color:#fff;padding:0 12px;font-size:15px;font-weight:900;text-align:left}
+.setup-slot+.setup-slot{margin-top:7px}
+.setup-slot:hover,.setup-slot:focus{border-color:var(--purple);outline:none}
+.team-picker{margin-top:12px;border:1px solid #604878;border-radius:14px;background:#100c18;padding:12px}
+.team-picker.hidden{display:none}
+.picker-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px}
+.picker-head b{font-size:13px}
+.picker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.picker-team{min-height:42px;border:1px solid var(--border);border-radius:9px;background:#21182c;color:#fff;padding:0 8px;font-size:12px;font-weight:900}
+.picker-team.current{border-color:var(--purple);background:#4b2a67}
+@media(max-width:760px){.picker-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .round-card{margin-top:12px}
 .round-card h3{font-size:15px;margin:0 0 8px}
 .control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
@@ -76,7 +85,7 @@ button{touch-action:manipulation}
       <div class="topline">
         <div>
           <div style="font-size:18px;font-weight:1000">16강 대진 설정</div>
-          <div class="hint">팀 이름을 원하는 위치로 바꾸고 시작을 눌러.</div>
+          <div class="hint">팀칸을 눌러 16개 팀 중에서 선택하고 대진을 맞춘 뒤 시작을 눌러.</div>
         </div>
         <div class="actions">
           <button class="btn primary" id="startBtn">시작</button>
@@ -84,6 +93,13 @@ button{touch-action:manipulation}
         </div>
       </div>
       <div class="setup-grid" id="setupGrid"></div>
+      <div class="team-picker hidden" id="teamPicker">
+        <div class="picker-head">
+          <b id="pickerTitle">팀 선택</b>
+          <button class="btn" id="closePicker" type="button">닫기</button>
+        </div>
+        <div class="picker-grid" id="pickerGrid"></div>
+      </div>
     </div>
 
     <div class="panel" id="runPanel" style="display:none">
@@ -154,15 +170,48 @@ function choose(key,t){
  results[key]=t; save(); renderAll();
 }
 
+let pickerIndex=null;
 function buildSetup(){
  const g=document.getElementById('setupGrid');g.innerHTML='';
  for(let i=0;i<8;i++){
   const d=document.createElement('div');d.className='setup';
-  d.innerHTML=`<b>${i+1}경기</b><input data-i="${i*2}" value="${teams[i*2]}"><input data-i="${i*2+1}" value="${teams[i*2+1]}">`;
+  const title=document.createElement('b');title.textContent=(i+1)+'경기';d.appendChild(title);
+  [i*2,i*2+1].forEach(idx=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='setup-slot';
+    b.textContent=teams[idx];
+    b.addEventListener('click',()=>openTeamPicker(idx));
+    d.appendChild(b);
+  });
   g.appendChild(d);
  }
- g.querySelectorAll('input').forEach(inp=>inp.addEventListener('input',e=>{teams[+e.target.dataset.i]=e.target.value;save();renderBroadcast()}));
 }
+function openTeamPicker(index){
+ pickerIndex=index;
+ const picker=document.getElementById('teamPicker');
+ document.getElementById('pickerTitle').textContent=(Math.floor(index/2)+1)+'경기 · '+(index%2===0?'위 팀':'아래 팀')+' 선택';
+ const grid=document.getElementById('pickerGrid');grid.innerHTML='';
+ defaults.forEach(name=>{
+   const b=document.createElement('button');
+   b.type='button';
+   b.className='picker-team'+(teams[index]===name?' current':'');
+   b.textContent=name;
+   b.addEventListener('click',()=>{
+     const other=teams.indexOf(name);
+     const old=teams[index];
+     if(other>=0 && other!==index) teams[other]=old;
+     teams[index]=name;
+     save();
+     picker.classList.add('hidden');
+     buildSetup();
+     renderBroadcast();
+   });
+   grid.appendChild(b);
+ });
+ picker.classList.remove('hidden');
+}
+document.getElementById('closePicker').addEventListener('click',()=>document.getElementById('teamPicker').classList.add('hidden'));
 function addRound(title,defs){
  const sec=document.createElement('div');sec.className='panel round-card';
  sec.innerHTML=`<h3>${title}</h3>`;
@@ -294,6 +343,7 @@ document.getElementById('startBtn').addEventListener('click',()=>{
  teams=teams.map(t=>t.trim());
  if(teams.some(t=>!t)){alert('빈 팀명이 있어.');return}
  results={};history=[];save();
+ document.getElementById('teamPicker').classList.add('hidden');
  document.getElementById('setupPanel').style.display='none';
  document.getElementById('runPanel').style.display='block';
  renderAll();
@@ -301,9 +351,10 @@ document.getElementById('startBtn').addEventListener('click',()=>{
 document.getElementById('undoBtn').addEventListener('click',()=>{if(!history.length)return;results=JSON.parse(history.pop());save();renderAll()});
 document.getElementById('editBtn').addEventListener('click',()=>{
  document.getElementById('setupPanel').style.display='block';
+ document.getElementById('teamPicker').classList.add('hidden');
  document.getElementById('runPanel').style.display='none';buildSetup();
 });
-document.getElementById('resetBtn').addEventListener('click',()=>{teams=[...defaults];results={};history=[];save();buildSetup();renderAll()});
+document.getElementById('resetBtn').addEventListener('click',()=>{teams=[...defaults];results={};history=[];save();document.getElementById('teamPicker').classList.add('hidden');buildSetup();renderAll()});
 function show(control){
  document.getElementById('controlScreen').classList.toggle('active',control);
  document.getElementById('broadcastScreen').classList.toggle('active',!control);
