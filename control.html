@@ -13,6 +13,16 @@ function openPicker(index){pickerIndex=index;document.getElementById("pickerTitl
 function closePicker(){document.getElementById("modal").classList.remove("show");pickerIndex=null;}
 function onSlot(id){
  if(!state.started){const idx=setupIndexFor(id);if(idx!==null)openPicker(idx);return;}
+ if(id==="TL"||id==="TR"){
+   const m=matchup(state,"THIRD"),team=id==="TL"?m[0]:m[1];
+   if(!m[0]||!m[1]||!team)return;
+   history.push(JSON.stringify(state));
+   const before=rankings(state).complete;
+   state=chooseWinner(state,"THIRD",team);
+   const after=rankings(state).complete;
+   if(!before&&after)state.podiumNonce=Date.now();
+   saveState(state);render();return;
+ }
  const team=slotTeam(state,id),key=keyForSlot(id);if(!team||!key)return;
  const m=matchup(state,key);if(!m[0]||!m[1])return;
  history.push(JSON.stringify(state));const before=rankings(state).complete;state=chooseWinner(state,key,team);const after=rankings(state).complete;if(!before&&after)state.podiumNonce=Date.now();saveState(state);render();
@@ -31,6 +41,8 @@ function render(){
  document.getElementById("status").textContent=state.started?"진행 중 · 16강 결과 "+Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length+" / 8 완료":"대진 설정 "+selected+" / 16";
  for(const id of slotIds){let team="";const idx=setupIndexFor(id);if(!state.started&&idx!==null)team=state.teams[idx]||"";else team=slotTeam(state,id);slotEls[id].textContent=team;slotEls[id].className=classFor(id,team);}
  const third=matchup(state,"THIRD");slotEls.TL.textContent=state.started?(third[0]||""):"";slotEls.TR.textContent=state.started?(third[1]||""):"";
+ slotEls.TL.className="slot"+(state.started&&third[0]&&third[1]&&!state.results.THIRD?" clickable":"");
+ slotEls.TR.className="slot"+(state.started&&third[0]&&third[1]&&!state.results.THIRD?" clickable":"");
  if(state.started&&state.results.THIRD){if(third[0]===state.results.THIRD)slotEls.TL.className="slot winner clickable";else slotEls.TL.className="slot loser clickable";if(third[1]===state.results.THIRD)slotEls.TR.className="slot winner clickable";else slotEls.TR.className="slot loser clickable";}
  slotEls.CHAMP.textContent=state.started?(state.results.FINAL||""):"";
  const n=Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length;document.getElementById("progress").textContent="결과 "+n+" / 8 완료";
