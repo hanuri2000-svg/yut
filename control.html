@@ -69,6 +69,13 @@ body{background:#09070e}
 @media(max-width:760px){
   .control-board{min-width:900px}
 }
+.control-board .progress-mask{display:none!important}
+@media(max-width:900px){
+  .toolbar{gap:10px}
+  .actions{width:100%}
+  .actions .btn{flex:1 1 auto}
+  .control-board{min-width:900px}
+}
 </style>
 </head>
 <body>
@@ -79,7 +86,7 @@ body{background:#09070e}
       <div class="sub" id="guide">빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.</div>
     </div>
     <div>
-      <div class="version">v1.0.3</div>
+      <div class="version">v1.0.4</div>
       <div class="actions" style="margin-top:6px">
         <button class="btn" id="openBroadcast">방송화면 열기</button>
         <button class="btn" id="undo">직전 결과 취소</button>
@@ -132,7 +139,7 @@ body{background:#09070e}
       </svg>
 
       <div class="progress-mask" id="progress">결과 0 / 8 완료</div>
-      <div class="board-version">CONTROL · v1.0.3</div>
+      <div class="board-version">CONTROL · v1.0.4</div>
     </div>
   </div>
 </div>
