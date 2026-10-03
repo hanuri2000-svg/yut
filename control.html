@@ -1,58 +1,339 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>도랑배 윷놀이 조작화면</title><link rel="stylesheet" href="./common.css"></head><body><div class="page">
-<div class="toolbar"><div><div class="title">도랑배 윷놀이 조작화면</div><div class="sub" id="guide">빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.</div></div><div><div class="version">v1.0.1</div><div class="actions" style="margin-top:6px"><button class="btn" id="openBroadcast">방송화면 열기</button><button class="btn" id="undo">직전 결과 취소</button><button class="btn" id="replay">최종 팝업 다시보기</button><button class="btn primary" id="start">시작</button><button class="btn" id="reset">대진 초기화</button></div></div></div>
-<div class="sub" id="status" style="margin-bottom:8px"></div><div class="board-wrap"><div class="board" id="board"><div class="progress-mask" id="progress">결과 0 / 8 완료</div><div class="board-version">CONTROL · v1.0.1</div></div></div>
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>도랑배 윷놀이 조작화면</title>
+<link rel="stylesheet" href="./common.css">
+<style>
+body{background:#09070e}
+.page{max-width:1600px}
+.control-board{
+  position:relative;
+  width:min(1536px,100%);
+  min-width:900px;
+  aspect-ratio:16/9;
+  overflow:hidden;
+  border:1px solid #3e3349;
+  border-radius:16px;
+  background:
+    radial-gradient(circle at 50% 48%,rgba(107,62,151,.16),transparent 27%),
+    linear-gradient(180deg,#14101c 0%,#0c0912 100%)!important;
+}
+.control-board .slot{
+  border:1px solid #655772;
+  border-radius:8px;
+  background:#18131f;
+  color:#f6f1fa;
+  text-shadow:none;
+  z-index:10;
+}
+.control-board .slot.clickable:hover{
+  outline:2px solid rgba(177,108,255,.85);
+  outline-offset:-2px;
+  background:#251832;
+}
+.control-board .slot.winner{
+  border-color:#b16cff;
+  background:#342047;
+  color:#fff;
+  box-shadow:0 0 10px rgba(177,108,255,.22);
+}
+.control-board .slot.loser{opacity:.28}
+.control-lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.control-lines path{fill:none;stroke:#5e5268;stroke-width:3}
+.round-label{
+  position:absolute;z-index:5;top:8.5%;
+  transform:translateX(-50%);
+  padding:6px 14px;border:1px solid #5d466f;border-radius:999px;
+  background:#1b1325;color:#d8cbe5;font-size:clamp(10px,1vw,15px);font-weight:1000;
+}
+.final-label{
+  position:absolute;left:50%;top:8%;transform:translateX(-50%);z-index:5;
+  color:#efe7f6;font-size:clamp(14px,1.5vw,24px);font-weight:1000;letter-spacing:.12em;
+}
+.final-caption{
+  position:absolute;left:50%;top:45%;transform:translateX(-50%);z-index:5;
+  color:#9a8da6;font-size:clamp(9px,.8vw,13px);font-weight:900;
+}
+.third-label{
+  position:absolute;left:50%;top:77.5%;transform:translateX(-50%);z-index:5;
+  color:#d7cce2;font-size:clamp(10px,1vw,15px);font-weight:1000;
+}
+.progress-mask{
+  left:auto;right:2%;top:2%;width:auto;min-width:165px;height:40px;
+  padding:0 14px;border:1px solid #54445f;border-radius:9px;background:#18121f;
+  font-size:clamp(10px,.95vw,15px);
+}
+.board-version{left:1.2%;bottom:1.4%}
+@media(max-width:760px){
+  .control-board{min-width:900px}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="toolbar">
+    <div>
+      <div class="title">도랑배 윷놀이 조작화면</div>
+      <div class="sub" id="guide">빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.</div>
+    </div>
+    <div>
+      <div class="version">v1.0.2</div>
+      <div class="actions" style="margin-top:6px">
+        <button class="btn" id="openBroadcast">방송화면 열기</button>
+        <button class="btn" id="undo">직전 결과 취소</button>
+        <button class="btn" id="replay">최종 팝업 다시보기</button>
+        <button class="btn primary" id="start">시작</button>
+        <button class="btn" id="reset">대진 초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sub" id="status" style="margin-bottom:8px"></div>
+
+  <div class="board-wrap">
+    <div class="control-board" id="board">
+      <div class="round-label" style="left:10%">16강</div>
+      <div class="round-label" style="left:28%">8강</div>
+      <div class="round-label" style="left:40%">4강</div>
+      <div class="final-label">결승</div>
+      <div class="round-label" style="left:60%">4강</div>
+      <div class="round-label" style="left:72%">8강</div>
+      <div class="round-label" style="left:90%">16강</div>
+      <div class="final-caption">우승팀</div>
+      <div class="third-label">3 · 4위전</div>
+
+      <svg class="control-lines" viewBox="0 0 1536 864" aria-hidden="true">
+        <path d="M240 283 H274 V315 H304"/><path d="M240 341 H274 V315 H304"/>
+        <path d="M240 401 H274 V431 H304"/><path d="M240 459 H274 V431 H304"/>
+        <path d="M240 522 H274 V554 H304"/><path d="M240 581 H274 V554 H304"/>
+        <path d="M240 642 H274 V674 H304"/><path d="M240 700 H274 V674 H304"/>
+        <path d="M395 315 H430 V375 H462"/><path d="M395 431 H430 V375 H462"/>
+        <path d="M395 554 H430 V612 H462"/><path d="M395 674 H430 V612 H462"/>
+        <path d="M558 375 H600 V476 H520"/><path d="M558 612 H600 V476 H520"/>
+        <path d="M610 476 H680 V508"/>
+
+        <path d="M1303 283 H1262 V315 H1229"/><path d="M1303 341 H1262 V315 H1229"/>
+        <path d="M1303 401 H1262 V431 H1229"/><path d="M1303 459 H1262 V431 H1229"/>
+        <path d="M1303 522 H1262 V554 H1229"/><path d="M1303 581 H1262 V554 H1229"/>
+        <path d="M1303 642 H1262 V674 H1229"/><path d="M1303 700 H1262 V674 H1229"/>
+        <path d="M1138 315 H1105 V375 H1073"/><path d="M1138 431 H1105 V375 H1073"/>
+        <path d="M1138 554 H1105 V612 H1073"/><path d="M1138 674 H1105 V612 H1073"/>
+        <path d="M977 375 H936 V476 H1016"/><path d="M977 612 H936 V476 H1016"/>
+        <path d="M926 476 H856 V508"/>
+      </svg>
+
+      <div class="progress-mask" id="progress">결과 0 / 8 완료</div>
+      <div class="board-version">CONTROL · v1.0.2</div>
+    </div>
+  </div>
 </div>
-<div class="modal" id="modal"><div class="picker"><div class="picker-head"><div><b id="pickerTitle">팀 선택</b><div class="sub">이미 선택된 팀은 다른 칸에서 먼저 빼야 해.</div></div><button class="btn" id="closeModal">닫기</button></div><div class="picker-grid" id="pickerGrid"></div><div class="actions" style="margin-top:10px"><button class="btn" id="clearSlot">이 칸 비우기</button></div></div></div>
-<script src="./shared.js"></script><script>
+
+<div class="modal" id="modal">
+  <div class="picker">
+    <div class="picker-head">
+      <div>
+        <b id="pickerTitle">팀 선택</b>
+        <div class="sub">원하는 팀을 눌러 이 칸에 배치해.</div>
+      </div>
+      <button class="btn" id="closeModal">닫기</button>
+    </div>
+    <div class="picker-grid" id="pickerGrid"></div>
+    <div class="actions" style="margin-top:10px">
+      <button class="btn" id="clearSlot">이 칸 비우기</button>
+    </div>
+  </div>
+</div>
+
+<script src="./shared.js"></script>
+<script>
 let state=loadState(),history=[],pickerIndex=null;
 const board=document.getElementById("board"),slotEls={};
 const slotIds=Object.keys(SLOT_POSITIONS);
-for(const id of slotIds){const b=document.createElement("button");b.type="button";b.className="slot";b.dataset.id=id;applyPosition(b,id);b.addEventListener("click",()=>onSlot(id));board.appendChild(b);slotEls[id]=b;}
-function setupIndexFor(id){if(/^L\d$/.test(id))return +id.slice(1);if(/^R\d$/.test(id))return 8+(+id.slice(1));return null;}
-function openPicker(index){pickerIndex=index;document.getElementById("pickerTitle").textContent=(index<8?"왼쪽 ":"오른쪽 ")+(index%8+1)+"번 팀 선택";const g=document.getElementById("pickerGrid");g.innerHTML="";for(const name of DEFAULT_TEAMS){const b=document.createElement("button");b.type="button";b.className="pick"+(state.teams[index]===name?" current":"");b.textContent=name;const used=state.teams.includes(name)&&state.teams[index]!==name;b.disabled=used;b.addEventListener("click",()=>{state.teams[index]=name;saveState(state);closePicker();render();});g.appendChild(b);}document.getElementById("modal").classList.add("show");}
-function closePicker(){document.getElementById("modal").classList.remove("show");pickerIndex=null;}
+
+for(const id of slotIds){
+  const b=document.createElement("button");
+  b.type="button";
+  b.className="slot";
+  b.dataset.id=id;
+  applyPosition(b,id);
+  b.addEventListener("click",()=>onSlot(id));
+  board.appendChild(b);
+  slotEls[id]=b;
+}
+
+function setupIndexFor(id){
+  if(/^L\d$/.test(id))return +id.slice(1);
+  if(/^R\d$/.test(id))return 8+(+id.slice(1));
+  return null;
+}
+
+function openPicker(index){
+  pickerIndex=index;
+  document.getElementById("pickerTitle").textContent=(index<8?"왼쪽 ":"오른쪽 ")+(index%8+1)+"번 팀 선택";
+  const g=document.getElementById("pickerGrid");
+  g.innerHTML="";
+  for(const name of DEFAULT_TEAMS){
+    const b=document.createElement("button");
+    b.type="button";
+    b.className="pick"+(state.teams[index]===name?" current":"");
+    b.textContent=name;
+    const used=state.teams.includes(name)&&state.teams[index]!==name;
+    b.disabled=used;
+    b.addEventListener("click",()=>{
+      state.teams[index]=name;
+      saveState(state);
+      closePicker();
+      render();
+    });
+    g.appendChild(b);
+  }
+  document.getElementById("modal").classList.add("show");
+}
+
+function closePicker(){
+  document.getElementById("modal").classList.remove("show");
+  pickerIndex=null;
+}
+
 function onSlot(id){
- if(!state.started){const idx=setupIndexFor(id);if(idx!==null)openPicker(idx);return;}
- if(id==="TL"||id==="TR"){
-   const m=matchup(state,"THIRD"),team=id==="TL"?m[0]:m[1];
-   if(!m[0]||!m[1]||!team)return;
-   history.push(JSON.stringify(state));
-   const before=rankings(state).complete;
-   state=chooseWinner(state,"THIRD",team);
-   const after=rankings(state).complete;
-   if(!before&&after)state.podiumNonce=Date.now();
-   saveState(state);render();return;
- }
- const team=slotTeam(state,id),key=keyForSlot(id);if(!team||!key)return;
- const m=matchup(state,key);if(!m[0]||!m[1])return;
- history.push(JSON.stringify(state));const before=rankings(state).complete;state=chooseWinner(state,key,team);const after=rankings(state).complete;if(!before&&after)state.podiumNonce=Date.now();saveState(state);render();
+  if(!state.started){
+    const idx=setupIndexFor(id);
+    if(idx!==null)openPicker(idx);
+    return;
+  }
+
+  if(id==="TL"||id==="TR"){
+    const m=matchup(state,"THIRD"),team=id==="TL"?m[0]:m[1];
+    if(!m[0]||!m[1]||!team)return;
+    history.push(JSON.stringify(state));
+    const before=rankings(state).complete;
+    state=chooseWinner(state,"THIRD",team);
+    const after=rankings(state).complete;
+    if(!before&&after)state.podiumNonce=Date.now();
+    saveState(state);
+    render();
+    return;
+  }
+
+  const team=slotTeam(state,id),key=keyForSlot(id);
+  if(!team||!key)return;
+  const m=matchup(state,key);
+  if(!m[0]||!m[1])return;
+
+  history.push(JSON.stringify(state));
+  const before=rankings(state).complete;
+  state=chooseWinner(state,key,team);
+  const after=rankings(state).complete;
+  if(!before&&after)state.podiumNonce=Date.now();
+  saveState(state);
+  render();
 }
+
 function classFor(id,team){
- const key=keyForSlot(id),m=matchup(state,key),w=state.results[key];let c="slot";
- if(!state.started&&setupIndexFor(id)!==null)c+=" clickable";
- if(state.started&&team&&m[0]&&m[1]&&!w)c+=" clickable";
- if(w&&team&&m.includes(team))c+=w===team?" winner":" loser";
- return c;
+  const key=keyForSlot(id),m=matchup(state,key),w=state.results[key];
+  let c="slot";
+  if(!state.started&&setupIndexFor(id)!==null)c+=" clickable";
+  if(state.started&&team&&m[0]&&m[1]&&!w)c+=" clickable";
+  if(w&&team&&m.includes(team))c+=w===team?" winner":" loser";
+  return c;
 }
+
 function render(){
- const selected=state.teams.filter(Boolean).length;document.getElementById("start").disabled=state.started||selected!==16;
- document.getElementById("undo").disabled=!state.started||history.length===0;document.getElementById("replay").disabled=!rankings(state).complete;
- document.getElementById("guide").textContent=state.started?"끝난 경기에서 이긴 팀 이름을 대진표에서 클릭하면 자동 진출해.":"빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.";
- document.getElementById("status").textContent=state.started?"진행 중 · 16강 결과 "+Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length+" / 8 완료":"대진 설정 "+selected+" / 16";
- for(const id of slotIds){let team="";const idx=setupIndexFor(id);if(!state.started&&idx!==null)team=state.teams[idx]||"";else team=slotTeam(state,id);slotEls[id].textContent=team;slotEls[id].className=classFor(id,team);}
- const third=matchup(state,"THIRD");slotEls.TL.textContent=state.started?(third[0]||""):"";slotEls.TR.textContent=state.started?(third[1]||""):"";
- slotEls.TL.className="slot"+(state.started&&third[0]&&third[1]&&!state.results.THIRD?" clickable":"");
- slotEls.TR.className="slot"+(state.started&&third[0]&&third[1]&&!state.results.THIRD?" clickable":"");
- if(state.started&&state.results.THIRD){if(third[0]===state.results.THIRD)slotEls.TL.className="slot winner clickable";else slotEls.TL.className="slot loser clickable";if(third[1]===state.results.THIRD)slotEls.TR.className="slot winner clickable";else slotEls.TR.className="slot loser clickable";}
- slotEls.CHAMP.textContent=state.started?(state.results.FINAL||""):"";
- const n=Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length;document.getElementById("progress").textContent="결과 "+n+" / 8 완료";
+  const selected=state.teams.filter(Boolean).length;
+  document.getElementById("start").disabled=state.started||selected!==16;
+  document.getElementById("undo").disabled=!state.started||history.length===0;
+  document.getElementById("replay").disabled=!rankings(state).complete;
+
+  document.getElementById("guide").textContent=state.started
+    ?"끝난 경기에서 이긴 팀 이름을 대진표에서 클릭하면 자동 진출해."
+    :"빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.";
+
+  document.getElementById("status").textContent=state.started
+    ?"진행 중 · 16강 결과 "+Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length+" / 8 완료"
+    :"대진 설정 "+selected+" / 16";
+
+  for(const id of slotIds){
+    let team="";
+    const idx=setupIndexFor(id);
+    if(!state.started&&idx!==null)team=state.teams[idx]||"";
+    else team=slotTeam(state,id);
+    slotEls[id].textContent=team;
+    slotEls[id].className=classFor(id,team);
+  }
+
+  const third=matchup(state,"THIRD");
+  slotEls.TL.textContent=state.started?(third[0]||""):"";
+  slotEls.TR.textContent=state.started?(third[1]||""):"";
+  slotEls.TL.className="slot"+(state.started&&third[0]&&third[1]&&!state.results.THIRD?" clickable":"");
+  slotEls.TR.className="slot"+(state.started&&third[0]&&third[1]&&!state.results.THIRD?" clickable":"");
+
+  if(state.started&&state.results.THIRD){
+    if(third[0]===state.results.THIRD){
+      slotEls.TL.className="slot winner clickable";
+      slotEls.TR.className="slot loser clickable";
+    }else{
+      slotEls.TR.className="slot winner clickable";
+      slotEls.TL.className="slot loser clickable";
+    }
+  }
+
+  slotEls.CHAMP.textContent=state.started?(state.results.FINAL||""):"";
+  const n=Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length;
+  document.getElementById("progress").textContent="결과 "+n+" / 8 완료";
 }
-document.getElementById("closeModal").onclick=closePicker;document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closePicker();});
-document.getElementById("clearSlot").onclick=()=>{if(pickerIndex!==null){state.teams[pickerIndex]="";saveState(state);closePicker();render();}};
-document.getElementById("start").onclick=()=>{if(state.teams.filter(Boolean).length!==16)return;state.started=true;state.results={};state.podiumNonce=0;history=[];saveState(state);render();};
-document.getElementById("reset").onclick=()=>{state=blankState();history=[];saveState(state);render();};
-document.getElementById("undo").onclick=()=>{if(!history.length)return;state=JSON.parse(history.pop());saveState(state);render();};
-document.getElementById("replay").onclick=()=>{if(rankings(state).complete){state.podiumNonce=Date.now();saveState(state);}};
+
+document.getElementById("closeModal").onclick=closePicker;
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closePicker();});
+document.getElementById("clearSlot").onclick=()=>{
+  if(pickerIndex!==null){
+    state.teams[pickerIndex]="";
+    saveState(state);
+    closePicker();
+    render();
+  }
+};
+
+document.getElementById("start").onclick=()=>{
+  if(state.teams.filter(Boolean).length!==16)return;
+  state.started=true;
+  state.results={};
+  state.podiumNonce=0;
+  history=[];
+  saveState(state);
+  render();
+};
+
+document.getElementById("reset").onclick=()=>{
+  state=blankState();
+  history=[];
+  saveState(state);
+  render();
+};
+
+document.getElementById("undo").onclick=()=>{
+  if(!history.length)return;
+  state=JSON.parse(history.pop());
+  saveState(state);
+  render();
+};
+
+document.getElementById("replay").onclick=()=>{
+  if(rankings(state).complete){
+    state.podiumNonce=Date.now();
+    saveState(state);
+  }
+};
+
 document.getElementById("openBroadcast").onclick=()=>window.open("./broadcast.html","newcatsleYutBroadcast","width=1280,height=720");
-watchState(s=>{state={...blankState(),...s,results:s.results||{}};render();});render();
-</script></body></html>
+
+watchState(s=>{
+  state={...blankState(),...s,results:s.results||{}};
+  render();
+});
+
+render();
+</script>
+</body>
+</html>
