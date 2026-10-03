@@ -1,9 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">\n<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">\n<meta http-equiv="Pragma" content="no-cache">\n<meta http-equiv="Expires" content="0">\n<meta name="app-version" content="2026.10.03.5">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>NEWCATSLE × 뉴엔터 윷놀이 대진표 v2026.10.03.9</title>
+<meta name="app-version" content="2026.10.03.11">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>NEWCATSLE × 뉴엔터 윷놀이 대진표 v2026.10.03.11</title>
 <style>
 :root{--bg:#0b0910;--panel:#15111f;--border:#43384d;--purple:#b16cff;--text:#f7f2fb;--muted:#a99db5}
 *{box-sizing:border-box}
@@ -59,45 +63,22 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
 .board-version{position:absolute;left:18px;bottom:12px;z-index:25;font-size:12px;color:#cbb7e6;opacity:.85;letter-spacing:.04em}
 .note{font-size:12px;color:var(--muted);margin-top:8px}
 @media(max-width:760px){.setup-grid,.control-grid,.picker-grid{grid-template-columns:1fr 1fr} .app{padding:8px}}
-</style>
-<style id="disable-live-lines">.live-svg{display:none!important}</style>
-<style id="third-place-highlight">#ov-TL.win,#ov-TR.win{color:#ffe6a3!important;font-weight:1000!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important}#ov-TL.lose,#ov-TR.lose{opacity:.25!important}</style><style id="final-podium-popup-style">
-.podium-popup{
-  position:absolute;inset:0;z-index:60;display:none;
-  align-items:center;justify-content:center;
-  background:rgba(4,3,8,.76);backdrop-filter:blur(3px);
-}
+
+.live-svg{display:none!important}
+#ov-PROG{left:1315px!important;top:155px!important;width:185px!important;height:32px!important;background:rgba(19,15,29,.99)!important;color:#fff!important;font-size:17px!important;font-weight:950!important;text-shadow:0 1px 2px #000!important;overflow:hidden!important}
+#ov-TL.win,#ov-TR.win{color:#ffe6a3!important;font-weight:1000!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important;opacity:1!important}
+#ov-TL.lose,#ov-TR.lose{opacity:.24!important}
+.podium-popup{position:absolute;inset:0;z-index:60;display:none;align-items:center;justify-content:center;background:rgba(4,3,8,.76);backdrop-filter:blur(3px)}
 .podium-popup.show{display:flex;animation:podiumFade .28s ease-out}
-.podium-wrap{
-  width:980px;max-width:86%;padding:34px 38px 30px;
-  border:1px solid rgba(213,190,239,.42);border-radius:24px;
-  background:linear-gradient(180deg,rgba(36,27,50,.97),rgba(14,11,21,.97));
-  box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 34px rgba(152,93,218,.22);
-  text-align:center;
-}
+.podium-wrap{width:980px;max-width:86%;padding:34px 38px 30px;border:1px solid rgba(213,190,239,.42);border-radius:24px;background:linear-gradient(180deg,rgba(36,27,50,.97),rgba(14,11,21,.97));box-shadow:0 24px 70px rgba(0,0,0,.55),0 0 34px rgba(152,93,218,.22);text-align:center}
 .podium-title{font-size:20px;font-weight:1000;letter-spacing:.14em;color:#d7c4ec;margin-bottom:24px}
 .podium-grid{display:grid;grid-template-columns:1fr 1.28fr 1fr;gap:18px;align-items:end}
-.podium-card{
-  min-height:170px;border-radius:18px;padding:20px 16px;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  background:rgba(20,16,29,.96);
-}
-.podium-card.first{
-  min-height:220px;border:2px solid #e3bd64;
-  box-shadow:0 0 30px rgba(227,189,100,.25);
-}
-.podium-card.second{border:2px solid #bfc4d2}
-.podium-card.third{border:2px solid #bc7a54}
-.podium-crown{font-size:42px;line-height:1;margin-bottom:8px;color:#f1c96e}
-.podium-rank{font-size:25px;font-weight:1000;margin-bottom:12px}
-.podium-card.first .podium-rank{color:#f1c96e;font-size:32px}
-.podium-card.second .podium-rank{color:#d5d9e3}
-.podium-card.third .podium-rank{color:#d69066}
-.podium-team{
-  width:100%;font-size:24px;font-weight:1000;color:#fff;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
-.podium-card.first .podium-team{font-size:30px}
+.podium-card{min-height:170px;border-radius:18px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(20,16,29,.96)}
+.podium-card.first{min-height:220px;border:2px solid #e3bd64;box-shadow:0 0 30px rgba(227,189,100,.25)}
+.podium-card.second{border:2px solid #bfc4d2}.podium-card.third{border:2px solid #bc7a54}
+.podium-crown{font-size:42px;line-height:1;margin-bottom:8px;color:#f1c96e}.podium-rank{font-size:25px;font-weight:1000;margin-bottom:12px}
+.podium-card.first .podium-rank{color:#f1c96e;font-size:32px}.podium-card.second .podium-rank{color:#d5d9e3}.podium-card.third .podium-rank{color:#d69066}
+.podium-team{width:100%;font-size:24px;font-weight:1000;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.podium-card.first .podium-team{font-size:30px}
 .podium-sub{margin-top:22px;font-size:12px;color:#9588a3;font-weight:800;letter-spacing:.08em}
 @keyframes podiumFade{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:scale(1)}}
 </style>
@@ -117,7 +98,7 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
           <div class="hint">팀칸을 눌러 16개 팀 중에서 선택하고 대진을 맞춘 뒤 시작을 눌러.</div>
         </div>
         <div style="text-align:right">
-          <div class="version">버전 v2026.10.03.9</div>
+          <div class="version">버전 v2026.10.03.11</div>
           <div class="actions" style="justify-content:flex-end;margin-top:6px">
             <button class="btn primary" id="startBtn" type="button">시작</button>
             <button class="btn" id="resetBtn" type="button">초기화</button>
@@ -141,13 +122,14 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
           <div class="hint">경기 끝난 순서대로 이긴 팀만 눌러.</div>
         </div>
         <div style="text-align:right">
-          <div class="version">버전 v2026.10.03.9</div>
+          <div class="version">버전 v2026.10.03.11</div>
           <div id="controlProgress" style="font-weight:1000;margin-top:6px">16강 결과 0 / 8 완료</div>
         </div>
       </div>
       <div class="actions" style="margin-top:12px">
         <button class="btn" id="undoBtn" type="button">직전 결과 취소</button>
-        <button class="btn" id="editBtn" type="button">대진 다시 설정</button><button class="btn" id="replayPodiumBtn" type="button">최종 결과 팝업 다시보기</button>
+        <button class="btn" id="editBtn" type="button">대진 다시 설정</button>
+        <button class="btn" id="replayPodiumBtn" type="button">최종 결과 팝업 다시보기</button>
       </div>
       <div id="controlRounds"></div>
     </div>
@@ -158,27 +140,17 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
       <div class="board" id="board">
         <svg class="live-svg" viewBox="0 0 1536 864" id="liveSvg"></svg>
         <div class="podium-popup" id="podiumPopup">
-  <div class="podium-wrap">
-    <div class="podium-title">FINAL RESULT</div>
-    <div class="podium-grid">
-      <div class="podium-card second">
-        <div class="podium-rank">2위</div>
-        <div class="podium-team" id="podium2">-</div>
-      </div>
-      <div class="podium-card first">
-        <div class="podium-crown">♛</div>
-        <div class="podium-rank">1위</div>
-        <div class="podium-team" id="podium1">-</div>
-      </div>
-      <div class="podium-card third">
-        <div class="podium-rank">3위</div>
-        <div class="podium-team" id="podium3">-</div>
-      </div>
-    </div>
-    <div class="podium-sub">NEWCATSLE × 뉴엔터 · 도랑배 윷놀이대회</div>
-  </div>
-</div>
-        <div class="board-version">v2026.10.03.9</div>
+          <div class="podium-wrap">
+            <div class="podium-title">FINAL RESULT</div>
+            <div class="podium-grid">
+              <div class="podium-card second"><div class="podium-rank">2위</div><div class="podium-team" id="podium2">-</div></div>
+              <div class="podium-card first"><div class="podium-crown">♛</div><div class="podium-rank">1위</div><div class="podium-team" id="podium1">-</div></div>
+              <div class="podium-card third"><div class="podium-rank">3위</div><div class="podium-team" id="podium3">-</div></div>
+            </div>
+            <div class="podium-sub">NEWCATSLE × 뉴엔터 · 도랑배 윷놀이대회</div>
+          </div>
+        </div>
+        <div class="board-version">v2026.10.03.11</div>
       </div>
     </div>
     <div class="note">시작 전에는 방송화면 칸을 비워 두고, 시작 후에만 16강 팀명이 표시되게 수정한 버전이야.</div>
@@ -187,10 +159,11 @@ button{font:inherit;touch-action:manipulation;cursor:pointer}
 
 <script>
 (()=>{
-const APP_VERSION='2026.10.03.9';
+const APP_VERSION='2026.10.03.11';
 const defaults=['트슈 · 단솔','니코 · 하윤','듀듀 · 미스','냥코 · 으니','뉴다 · 복실','도랑 · 재욱','아송 · 쫑알','막현 · 퀸주','아깽 · 대휘','키링 · 갑숙','봉구 · 빵지니','난강 · 밍또','유즈 · 성균','건욱 · 키키','액구 · 유성','두링 · 성준'];
 const STORAGE_KEY='nc_yut_v5';
 let teams=[...defaults], results={}, history=[], started=false, pickerIndex=null;
+let podiumTimer=null, podiumPending=false, lastPodiumSignature='';
 try{
  const s=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null');
  if(s&&Array.isArray(s.teams)&&s.teams.length===16)teams=s.teams;
@@ -198,33 +171,33 @@ try{
  if(s&&typeof s.started==='boolean')started=s.started;
 }catch(e){}
 const save=()=>localStorage.setItem(STORAGE_KEY,JSON.stringify({teams,results,started}));
-let podiumTimer=null;
-let lastPodiumSignature='';
 function getPodium(){
-  const f=match('FINAL');
-  const first=started?(results.FINAL||''):'';
-  const second=started&&first&&f[0]&&f[1]?(first===f[0]?f[1]:f[0]):'';
-  const third=started?(results.THIRD||''):'';
-  return {first,second,third};
+ const f=match('FINAL');
+ const first=started?(results.FINAL||''):'';
+ const second=started&&first&&f[0]&&f[1]?(first===f[0]?f[1]:f[0]):'';
+ const third=started?(results.THIRD||''):'';
+ return {first,second,third};
 }
 function hidePodium(){
-  const el=document.getElementById('podiumPopup');
-  if(el) el.classList.remove('show');
-  if(podiumTimer){clearTimeout(podiumTimer);podiumTimer=null;}
+ const el=document.getElementById('podiumPopup');
+ if(el)el.classList.remove('show');
+ podiumPending=false;
+ if(podiumTimer){clearTimeout(podiumTimer);podiumTimer=null;}
 }
 function showPodium(force=false){
-  const {first,second,third}=getPodium();
-  if(!first||!second||!third)return;
-  const sig=first+'|'+second+'|'+third;
-  if(!force && sig===lastPodiumSignature)return;
-  lastPodiumSignature=sig;
-  document.getElementById('podium1').textContent=first;
-  document.getElementById('podium2').textContent=second;
-  document.getElementById('podium3').textContent=third;
-  const el=document.getElementById('podiumPopup');
-  el.classList.add('show');
-  if(podiumTimer)clearTimeout(podiumTimer);
-  podiumTimer=setTimeout(()=>el.classList.remove('show'),9000);
+ const {first,second,third}=getPodium();
+ if(!first||!second||!third)return;
+ const sig=first+'|'+second+'|'+third;
+ const visible=document.getElementById('broadcastScreen').classList.contains('active');
+ if(!force&&!visible){podiumPending=true;return;}
+ if(!force&&sig===lastPodiumSignature)return;
+ lastPodiumSignature=sig; podiumPending=false;
+ document.getElementById('podium1').textContent=first;
+ document.getElementById('podium2').textContent=second;
+ document.getElementById('podium3').textContent=third;
+ const el=document.getElementById('podiumPopup');el.classList.add('show');
+ if(podiumTimer)clearTimeout(podiumTimer);
+ podiumTimer=setTimeout(()=>el.classList.remove('show'),9000);
 }
 
 
@@ -339,7 +312,7 @@ ov('RS0',977,361,96,29,'small');ov('RS1',977,598,96,29,'small');
 ov('LF',523,461,82,30,'small');ov('RF',931,461,82,30,'small');
 ov('CHAMP',680,489,176,38,'champion');
 ov('TL',566,719,142,31,'small');ov('TR',824,719,142,31,'small');
-ov('PROG',1352,156,125,29,'progress');
+ov('PROG',1315,155,185,32,'progress');
 
 const svg=document.getElementById('liveSvg');
 const lines={};
@@ -411,11 +384,16 @@ function renderBroadcast(){
  overlays.LF.classList.remove('win','lose');overlays.RF.classList.remove('win','lose');
  if(started && results.L4)overlays.LF.classList.add('win'); if(started && results.R4)overlays.RF.classList.add('win');
  overlays.CHAMP.textContent=started ? (results.FINAL||'') : '';
- const th=match('THIRD'); overlays.TL.textContent=started ? (th[0] ? ((results.THIRD===th[0]?'3위 · ':'')+th[0]) : '') : ''; overlays.TR.textContent=started ? (th[1] ? ((results.THIRD===th[1]?'3위 · ':'')+th[1]) : '') : '';
- overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]); overlays.TL.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[0] && !!th[0]); overlays.TR.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[1] && !!th[1]);
+ const th=match('THIRD');
+ overlays.TL.textContent=started ? (th[0] ? ((results.THIRD===th[0]?'3위 · ':'')+th[0]) : '') : '';
+ overlays.TR.textContent=started ? (th[1] ? ((results.THIRD===th[1]?'3위 · ':'')+th[1]) : '') : '';
+ overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]);
+ overlays.TL.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[0] && !!th[0]); overlays.TR.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[1] && !!th[1]);
  const n=Object.keys(results).filter(k=>k.startsWith('L16_')||k.startsWith('R16_')).length;
  overlays.PROG.textContent=`결과 ${n} / 8 완료`;
- const finalTeams=match('FINAL'); const finalWinner=started ? (results.FINAL||'') : ''; const secondPlace=started && finalWinner && finalTeams[0] && finalTeams[1] ? (finalWinner===finalTeams[0]?finalTeams[1]:finalTeams[0]) : ''; document.getElementById('rank1Team').textContent=finalWinner||'-'; document.getElementById('rank2Team').textContent=secondPlace||'-'; document.getElementById('rank3Team').textContent=(started ? (results.THIRD||'') : '')||'-'; const podium=getPodium(); if(podium.first&&podium.second&&podium.third){showPodium(false);} else {hidePodium(); lastPodiumSignature='';} const act=activeSet();Object.entries(lines).forEach(([id,p])=>p.classList.toggle('on',act.has(id)));
+ const podium=getPodium();
+ if(podium.first&&podium.second&&podium.third){showPodium(false);}else{hidePodium();lastPodiumSignature='';}
+ const act=activeSet();Object.entries(lines).forEach(([id,p])=>p.classList.toggle('on',act.has(id)));
 }
 function renderAll(){renderControl();renderBroadcast();}
 
@@ -438,14 +416,14 @@ document.getElementById('editBtn').addEventListener('click',()=>{
 });
 document.getElementById('resetBtn').addEventListener('click',()=>{teams=[...defaults];results={};history=[];started=false;save();document.getElementById('teamPicker').classList.add('hidden');buildSetup();renderAll()});
 document.getElementById('closePicker').addEventListener('click',()=>document.getElementById('teamPicker').classList.add('hidden'));
+document.getElementById('replayPodiumBtn').addEventListener('click',()=>{show(false);setTimeout(()=>showPodium(true),80);});
 function show(control){
  document.getElementById('controlScreen').classList.toggle('active',control);
  document.getElementById('broadcastScreen').classList.toggle('active',!control);
  document.getElementById('tabControl').classList.toggle('active',control);
  document.getElementById('tabBroadcast').classList.toggle('active',!control);
- if(!control)renderBroadcast();
+ if(!control){renderBroadcast();if(podiumPending)setTimeout(()=>showPodium(true),80);}
 }
-document.getElementById('replayPodiumBtn').addEventListener('click',()=>{show(false);setTimeout(()=>showPodium(true),50);});
 document.getElementById('tabControl').addEventListener('click',()=>show(true));
 document.getElementById('tabBroadcast').addEventListener('click',()=>show(false));
 if(started){document.getElementById('setupPanel').style.display='none';document.getElementById('runPanel').style.display='block';}
@@ -454,25 +432,19 @@ buildSetup();renderAll();
 </script>
 
 <script id="auto-update-watcher">
-(() => {
-  const CHECK_MS = 30000;
-  const currentVersion = document.querySelector('meta[name="app-version"]')?.content || '';
-  async function checkForUpdate() {
-    try {
-      const url = new URL(location.pathname, location.origin);
-      url.searchParams.set('_update_check', Date.now().toString());
-      const res = await fetch(url.toString(), { cache: 'no-store' });
-      if (!res.ok) return;
-      const html = await res.text();
-      const m = html.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)["']/i);
-      const remoteVersion = m ? m[1] : '';
-      if (remoteVersion && currentVersion && remoteVersion !== currentVersion) {
-        location.replace(url.pathname + '?v=' + encodeURIComponent(remoteVersion));
-      }
-    } catch (e) {}
-  }
-  setTimeout(checkForUpdate, 5000);
-  setInterval(checkForUpdate, CHECK_MS);
+(()=>{
+ const CHECK_MS=30000;
+ const current=document.querySelector('meta[name="app-version"]')?.content||'';
+ async function check(){
+  try{
+   const u=new URL(location.pathname,location.origin);u.searchParams.set('_update_check',Date.now().toString());
+   const r=await fetch(u.toString(),{cache:'no-store'});if(!r.ok)return;const h=await r.text();
+   const m=h.match(/<meta\s+name=["']app-version["']\s+content=["']([^"']+)["']/i);const remote=m?m[1]:'';
+   if(remote&&current&&remote!==current)location.replace(u.pathname+'?v='+encodeURIComponent(remote));
+  }catch(e){}
+ }
+ setTimeout(check,5000);setInterval(check,CHECK_MS);
 })();
-</script>\n</body>
+</script>
+</body>
 </html>
