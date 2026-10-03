@@ -1,0 +1,72 @@
+name: Highlight third place winner
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".github/workflows/highlight-third-place.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Highlight 3rd place winner
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path("index.html")
+          s = p.read_text(encoding="utf-8")
+
+          # Bump visible/auto-update version wherever the previous one appears.
+          for old in ["v2026.10.03.6", "2026.10.03.6"]:
+              s = s.replace(old, old.replace(".6", ".7"))
+
+          # Add explicit styling for the 3·4 place winner and loser.
+          css = """
+<style id="third-place-highlight">
+#ov-TL.win,#ov-TR.win{
+  color:#ffe6a3!important;
+  font-weight:1000!important;
+  text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important;
+}
+#ov-TL.lose,#ov-TR.lose{
+  opacity:.25!important;
+}
+</style>
+"""
+          if 'id="third-place-highlight"' not in s:
+              s = s.replace("</head>", css + "\n</head>")
+
+          # Make the winning team explicitly say "3위 ·", and dim the losing side.
+          old = """const th=match('THIRD'); overlays.TL.textContent=started ? (th[0]||'') : ''; overlays.TR.textContent=started ? (th[1]||'') : '';
+ overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]);"""
+          new = """const th=match('THIRD');
+ overlays.TL.textContent=started ? (th[0] ? ((results.THIRD===th[0]?'3위 · ':'')+th[0]) : '') : '';
+ overlays.TR.textContent=started ? (th[1] ? ((results.THIRD===th[1]?'3위 · ':'')+th[1]) : '') : '';
+ overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]);
+ overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]);
+ overlays.TL.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[0] && !!th[0]);
+ overlays.TR.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[1] && !!th[1]);"""
+          if old in s:
+              s = s.replace(old, new)
+          else:
+              # Fallback for compact formatting variants.
+              s = s.replace(
+                  "overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]);",
+                  "overlays.TL.classList.toggle('win',started && results.THIRD===th[0]&&!!th[0]); overlays.TR.classList.toggle('win',started && results.THIRD===th[1]&&!!th[1]); overlays.TL.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[0] && !!th[0]); overlays.TR.classList.toggle('lose',started && !!results.THIRD && results.THIRD!==th[1] && !!th[1]);"
+              )
+
+          p.write_text(s, encoding="utf-8")
+
+      - name: Commit change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Highlight third place winner" || exit 0
+          git push
