@@ -1,13 +1,47 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>도랑배 윷놀이 방송화면</title><link rel="stylesheet" href="./common.css"><style>body{overflow:hidden}.page{max-width:none;padding:0}.board-wrap{overflow:hidden}.board{width:100vw;min-width:0;border-radius:0}.broadcast-slot{pointer-events:none}.third-win{color:#ffe6a3!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important}.third-lose{opacity:.25}</style></head><body><div class="page"><div class="board-wrap"><div class="board" id="board"><div class="progress-mask" id="progress">결과 0 / 8 완료</div><div class="board-version">BROADCAST · v1.0.9</div></div></div>
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>도랑배 윷놀이 방송화면</title><link rel="stylesheet" href="./common.css"><style>body{overflow:hidden}.page{max-width:none;padding:0}.board-wrap{overflow:hidden}.board{width:100vw;min-width:0;border-radius:0}.broadcast-slot{pointer-events:none}.third-win{color:#ffe6a3!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important}.third-lose{opacity:.25}</style></head><body><div class="page"><div class="board-wrap"><div class="board" id="board"><div class="progress-mask" id="progress">결과 0 / 8 완료</div><div class="board-version">BROADCAST · v1.0.10</div>
+<div class="podium" id="rankingPopup">
+  <div class="podium-wrap" style="position:relative">
+    <button id="closeRankingPopup" aria-label="순위 팝업 닫기" style="position:absolute;right:14px;top:12px;width:38px;height:38px;border:1px solid #5a4b65;border-radius:50%;background:#211829;color:#fff;font-size:22px;font-weight:900;line-height:1;cursor:pointer">×</button>
+    <div class="podium-title">FINAL RESULT</div>
+    <div class="podium-grid">
+      <div class="podium-card second"><div class="rank">2위</div><div class="podium-team" id="rank2">-</div></div>
+      <div class="podium-card first"><div class="crown">♛</div><div class="rank">1위</div><div class="podium-team" id="rank1">-</div></div>
+      <div class="podium-card third"><div class="rank">3위</div><div class="podium-team" id="rank3">-</div></div>
+    </div>
+  </div>
+</div></div></div>
 <script src="./shared.js"></script><script>
-let state=loadState();const board=document.getElementById("board"),els={};
+let state=loadState(),lastRankingSignature="";const board=document.getElementById("board"),els={};
 for(const id of Object.keys(SLOT_POSITIONS)){const d=document.createElement("div");d.className="slot broadcast-slot";applyPosition(d,id);board.appendChild(d);els[id]=d;}
+function showRankingPopup(){
+  const r=rankings(state);
+  if(!r.complete)return;
+  document.getElementById("rank1").textContent=r.first;
+  document.getElementById("rank2").textContent=r.second;
+  document.getElementById("rank3").textContent=r.third;
+  document.getElementById("rankingPopup").classList.add("show");
+}
+function closeRankingPopup(){
+  document.getElementById("rankingPopup").classList.remove("show");
+}
+document.getElementById("closeRankingPopup").addEventListener("click",closeRankingPopup);
+document.getElementById("rankingPopup").addEventListener("click",e=>{if(e.target.id==="rankingPopup")closeRankingPopup();});
 function render(){
  for(const id of Object.keys(SLOT_POSITIONS)){els[id].className="slot broadcast-slot";els[id].textContent=slotTeam(state,id);}
  const third=matchup(state,"THIRD");els.TL.textContent=state.started?(third[0]||""):"";els.TR.textContent=state.started?(third[1]||""):"";
  if(state.started&&state.results.THIRD){if(third[0]===state.results.THIRD){els.TL.textContent="3위 · "+third[0];els.TL.classList.add("third-win");els.TR.classList.add("third-lose");}else if(third[1]===state.results.THIRD){els.TR.textContent="3위 · "+third[1];els.TR.classList.add("third-win");els.TL.classList.add("third-lose");}}
  els.CHAMP.textContent=state.started?(state.results.FINAL||""):"";
  const n=Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length;document.getElementById("progress").textContent="결과 "+n+" / 8 완료";
+ const rr=rankings(state);
+ const sig=rr.complete?(state.results.FINAL+"|"+state.results.THIRD):"";
+ if(rr.complete&&sig!==lastRankingSignature){
+   lastRankingSignature=sig;
+   showRankingPopup();
+ }
+ if(!rr.complete){
+   closeRankingPopup();
+   lastRankingSignature="";
+ }
 }
 watchState(s=>{state={...blankState(),...s,results:s.results||{}};render();});render();
 </script></body></html>
