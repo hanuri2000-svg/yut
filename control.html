@@ -76,6 +76,14 @@ body{background:#09070e}
   .actions .btn{flex:1 1 auto}
   .control-board{min-width:900px}
 }
+
+.roster-editor{width:min(760px,96vw)}
+.roster-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.roster-row{display:grid;grid-template-columns:34px 1fr;align-items:center;gap:8px}
+.roster-row span{color:#bfaed0;font-size:12px;font-weight:900;text-align:center}
+.roster-input{width:100%;min-height:44px;border:1px solid #44384e;border-radius:9px;background:#17121f;color:#fff;padding:0 11px;font-size:15px;font-weight:800;outline:none}
+.roster-input:focus{border-color:#8c55bd;box-shadow:0 0 0 2px rgba(177,108,255,.12)}
+@media(max-width:760px){.roster-editor-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -86,9 +94,9 @@ body{background:#09070e}
       <div class="sub" id="guide">빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.</div>
     </div>
     <div>
-      <div class="version">v1.0.5</div>
+      <div class="version">v1.0.6</div>
       <div class="actions" style="margin-top:6px">
-        <button class="btn" id="openBroadcast">방송화면 열기</button>
+        <button class="btn" id="openBroadcast">방송화면 열기</button><button class="btn" id="editRoster">팀 명단 수정</button>
         <button class="btn" id="undo">직전 결과 취소</button>
         <button class="btn" id="replay">최종 팝업 다시보기</button>
         <button class="btn primary" id="start">시작</button>
@@ -100,10 +108,10 @@ body{background:#09070e}
   <div class="sub" id="status" style="margin-bottom:8px"></div>
 <div id="usageGuide" style="max-width:1536px;margin:0 auto 10px;padding:10px 12px;border:1px solid #3e3349;border-radius:12px;background:#120e18;color:#d7cde1;font-size:13px;line-height:1.6">
   <b style="color:#fff">사용 방법</b><br>
-  ① <b>대진 설정:</b> 시작 전 빈 16강 칸을 클릭 → 팀 선택 → 16팀 모두 배치<br>
-  ② <b>경기 시작:</b> 16팀 배치 후 <b>시작</b> 버튼 클릭<br>
-  ③ <b>승자 표시:</b> 경기 종료 후 대진표에서 <b>이긴 팀 이름을 클릭</b> → 다음 라운드 자동 진출<br>
-  ④ 잘못 눌렀으면 <b>직전 결과 취소</b> 사용
+  ① <b>팀 명단:</b> 필요하면 <b>팀 명단 수정</b>에서 16개 팀 이름 변경<br>  ② <b>대진 설정:</b> 시작 전 빈 16강 칸을 클릭 → 팀 선택 → 16팀 모두 배치<br>
+  ③ <b>경기 시작:</b> 16팀 배치 후 <b>시작</b> 버튼 클릭<br>
+  ④ <b>승자 표시:</b> 경기 종료 후 대진표에서 <b>이긴 팀 이름을 클릭</b> → 다음 라운드 자동 진출<br>
+  ⑤ 잘못 눌렀으면 <b>직전 결과 취소</b> 사용
 </div>
 
   <div class="board-wrap">
@@ -139,7 +147,7 @@ body{background:#09070e}
       </svg>
 
       <div class="progress-mask" id="progress">결과 0 / 8 완료</div>
-      <div class="board-version">CONTROL · v1.0.5</div>
+      <div class="board-version">CONTROL · v1.0.6</div>
     </div>
   </div>
 </div>
@@ -156,6 +164,23 @@ body{background:#09070e}
     <div class="picker-grid" id="pickerGrid"></div>
     <div class="actions" style="margin-top:10px">
       <button class="btn" id="clearSlot">이 칸 비우기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="rosterModal">
+  <div class="picker roster-editor">
+    <div class="picker-head">
+      <div>
+        <b>팀 명단 수정</b>
+        <div class="sub">16개 팀 이름을 수정하고 저장해. 대진 설정의 팀 선택 목록에도 바로 반영돼.</div>
+      </div>
+      <button class="btn" id="closeRoster">닫기</button>
+    </div>
+    <div class="roster-editor-grid" id="rosterGrid"></div>
+    <div class="actions" style="margin-top:12px">
+      <button class="btn primary" id="saveRoster">명단 저장</button>
+      <button class="btn" id="resetRoster">기본 명단으로</button>
     </div>
   </div>
 </div>
@@ -188,7 +213,7 @@ function openPicker(index){
   document.getElementById("pickerTitle").textContent=(index<8?"왼쪽 ":"오른쪽 ")+(index%8+1)+"번 팀 선택";
   const g=document.getElementById("pickerGrid");
   g.innerHTML="";
-  for(const name of DEFAULT_TEAMS){
+  for(const name of state.roster){
     const b=document.createElement("button");
     b.type="button";
     b.className="pick"+(state.teams[index]===name?" current":"");
@@ -206,6 +231,37 @@ function openPicker(index){
   document.getElementById("modal").classList.add("show");
 }
 
+function openRosterEditor(){
+  if(state.started)return;
+  const g=document.getElementById("rosterGrid");
+  g.innerHTML="";
+  state.roster.forEach((name,idx)=>{
+    const row=document.createElement("label");
+    row.className="roster-row";
+    row.innerHTML='<span>'+(idx+1)+'</span><input class="roster-input" data-roster-index="'+idx+'" value="">';
+    row.querySelector("input").value=name;
+    g.appendChild(row);
+  });
+  document.getElementById("rosterModal").classList.add("show");
+}
+function closeRosterEditor(){
+  document.getElementById("rosterModal").classList.remove("show");
+}
+function saveRosterEditor(){
+  const inputs=[...document.querySelectorAll(".roster-input")];
+  const next=inputs.map(el=>el.value.trim());
+  if(next.some(v=>!v)){alert("빈 팀명이 있어.");return;}
+  if(new Set(next).size!==16){alert("중복된 팀명이 있어.");return;}
+  const prev=[...state.roster];
+  state.teams=state.teams.map(name=>{
+    const idx=prev.indexOf(name);
+    return idx>=0?next[idx]:name;
+  });
+  state.roster=next;
+  saveState(state);
+  closeRosterEditor();
+  render();
+}
 function closePicker(){
   document.getElementById("modal").classList.remove("show");
   pickerIndex=null;
@@ -259,6 +315,7 @@ function render(){
   document.getElementById("start").disabled=state.started||selected!==16;
   document.getElementById("undo").disabled=!state.started||history.length===0;
   document.getElementById("replay").disabled=!rankings(state).complete;
+  document.getElementById("editRoster").disabled=state.started;
 
   document.getElementById("guide").textContent=state.started
     ?"끝난 경기에서 이긴 팀 이름을 대진표에서 클릭하면 자동 진출해."
@@ -340,6 +397,23 @@ document.getElementById("replay").onclick=()=>{
   }
 };
 
+document.getElementById("editRoster").onclick=openRosterEditor;
+document.getElementById("closeRoster").onclick=closeRosterEditor;
+document.getElementById("rosterModal").addEventListener("click",e=>{if(e.target.id==="rosterModal")closeRosterEditor();});
+document.getElementById("saveRoster").onclick=saveRosterEditor;
+document.getElementById("resetRoster").onclick=()=>{
+  if(!confirm("팀 명단을 기본 16팀으로 되돌릴까?"))return;
+  const prev=[...state.roster];
+  const next=[...DEFAULT_TEAMS];
+  state.teams=state.teams.map(name=>{
+    const idx=prev.indexOf(name);
+    return idx>=0?next[idx]:name;
+  });
+  state.roster=next;
+  saveState(state);
+  openRosterEditor();
+  render();
+};
 document.getElementById("openBroadcast").onclick=()=>window.open("./broadcast.html","newcatsleYutBroadcast","width=1280,height=720");
 
 watchState(s=>{
