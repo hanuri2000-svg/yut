@@ -84,6 +84,17 @@ body{background:#09070e}
 .roster-input{width:100%;min-height:44px;border:1px solid #44384e;border-radius:9px;background:#17121f;color:#fff;padding:0 11px;font-size:15px;font-weight:800;outline:none}
 .roster-input:focus{border-color:#8c55bd;box-shadow:0 0 0 2px rgba(177,108,255,.12)}
 @media(max-width:760px){.roster-editor-grid{grid-template-columns:1fr}}
+
+.roster-editor{max-height:calc(100dvh - 24px);overflow:auto;-webkit-overflow-scrolling:touch}
+.roster-head-actions{flex-shrink:0}
+.roster-footer-actions{position:sticky;bottom:0;margin:12px -16px -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:#100c18;border-top:1px solid #30243a;z-index:5}
+@media(max-width:760px){
+  .roster-editor{width:calc(100vw - 16px);max-height:calc(100dvh - 16px);padding:12px}
+  .roster-editor .picker-head{align-items:flex-start;flex-direction:column}
+  .roster-head-actions{width:100%}
+  .roster-head-actions .btn{flex:1 1 0}
+  .roster-footer-actions{margin:12px -12px -12px;padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
@@ -94,7 +105,7 @@ body{background:#09070e}
       <div class="sub" id="guide">빈 16강 칸을 눌러 팀을 선택해. 16팀을 모두 넣으면 시작할 수 있어.</div>
     </div>
     <div>
-      <div class="version">v1.0.6</div>
+      <div class="version">v1.0.7</div>
       <div class="actions" style="margin-top:6px">
         <button class="btn" id="openBroadcast">방송화면 열기</button><button class="btn" id="editRoster">팀 명단 수정</button>
         <button class="btn" id="undo">직전 결과 취소</button>
@@ -147,7 +158,7 @@ body{background:#09070e}
       </svg>
 
       <div class="progress-mask" id="progress">결과 0 / 8 완료</div>
-      <div class="board-version">CONTROL · v1.0.6</div>
+      <div class="board-version">CONTROL · v1.0.7</div>
     </div>
   </div>
 </div>
@@ -173,13 +184,15 @@ body{background:#09070e}
     <div class="picker-head">
       <div>
         <b>팀 명단 수정</b>
-        <div class="sub">16개 팀 이름을 수정하고 저장해. 대진 설정의 팀 선택 목록에도 바로 반영돼.</div>
+        <div class="sub">16개 팀 이름을 수정한 뒤 <b>팀 명단 확정</b>을 눌러.</div>
       </div>
-      <button class="btn" id="closeRoster">닫기</button>
+      <div class="actions roster-head-actions">
+        <button class="btn primary" id="saveRoster">팀 명단 확정</button>
+        <button class="btn" id="closeRoster">닫기</button>
+      </div>
     </div>
     <div class="roster-editor-grid" id="rosterGrid"></div>
-    <div class="actions" style="margin-top:12px">
-      <button class="btn primary" id="saveRoster">명단 저장</button>
+    <div class="actions roster-footer-actions">
       <button class="btn" id="resetRoster">기본 명단으로</button>
     </div>
   </div>
