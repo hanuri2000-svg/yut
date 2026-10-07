@@ -1,4 +1,4 @@
-const APP_VERSION="1.0.6";
+const APP_VERSION="1.0.7";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const DEFAULT_TEAMS=["트슈 · 단솔","니코 · 하윤","듀듀 · 미스","냥코 · 으니","뉴다 · 복실","도랑 · 재욱","아송 · 쫑알","막현 · 퀸주","아깽 · 대휘","키링 · 갑숙","봉구 · 빵지니","난강 · 밍또","유즈 · 성균","건욱 · 키키","액구 · 유성","두링 · 성준"];
