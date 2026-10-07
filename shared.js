@@ -1,4 +1,4 @@
-const APP_VERSION="1.0.5";
+const APP_VERSION="1.0.6";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const DEFAULT_TEAMS=["트슈 · 단솔","니코 · 하윤","듀듀 · 미스","냥코 · 으니","뉴다 · 복실","도랑 · 재욱","아송 · 쫑알","막현 · 퀸주","아깽 · 대휘","키링 · 갑숙","봉구 · 빵지니","난강 · 밍또","유즈 · 성균","건욱 · 키키","액구 · 유성","두링 · 성준"];
@@ -10,11 +10,11 @@ RQ0:[1138,301,91,28],RQ1:[1138,417,91,28],RQ2:[1138,540,91,28],RQ3:[1138,660,91,
 LS0:[462,361,96,29],LS1:[462,598,96,29],RS0:[977,361,96,29],RS1:[977,598,96,29],
 LF:[520,461,90,30],RF:[926,461,90,30],CHAMP:[680,489,176,38],TL:[566,719,142,31],TR:[824,719,142,31]
 };
-function blankState(){return {teams:Array(16).fill(""),started:false,results:{},podiumNonce:0,updatedAt:Date.now()};}
+function blankState(){return {roster:[...DEFAULT_TEAMS],teams:Array(16).fill(""),started:false,results:{},podiumNonce:0,updatedAt:Date.now()};}
 function loadState(){
   try{
     const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
-    if(v&&Array.isArray(v.teams)&&v.teams.length===16)return {...blankState(),...v,results:v.results||{}};
+    if(v&&Array.isArray(v.teams)&&v.teams.length===16){const base=blankState();return {...base,...v,roster:Array.isArray(v.roster)&&v.roster.length===16?v.roster:[...DEFAULT_TEAMS],results:v.results||{}};}
   }catch(e){}
   return blankState();
 }
