@@ -1,4 +1,4 @@
-const APP_VERSION="1.0.10";
+const APP_VERSION="1.0.11";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const DEFAULT_TEAMS=["트슈 · 단솔","니코 · 하윤","듀듀 · 미스","냥코 · 으니","뉴다 · 복실","도랑 · 재욱","아송 · 쫑알","막현 · 퀸주","아깽 · 대휘","키링 · 갑숙","봉구 · 빵지니","난강 · 밍또","유즈 · 성균","건욱 · 키키","액구 · 유성","두링 · 성준"];
@@ -58,6 +58,37 @@ function chooseWinner(state,key,team){
   if(!team||!m.includes(team))return state;
   for(const k of downstream(key))delete state.results[k];
   state.results[key]=team;
+  return autoAdvanceByes(state);
+}
+function autoAdvanceByes(state){
+  const r=state.results||{};
+  function children(key){
+    if(/^L8_/.test(key)){const n=+key.split("_")[1]*2;return["L16_"+n,"L16_"+(n+1)];}
+    if(/^R8_/.test(key)){const n=+key.split("_")[1]*2;return["R16_"+n,"R16_"+(n+1)];}
+    if(key==="L4")return["L8_0","L8_1"];
+    if(key==="R4")return["R8_0","R8_1"];
+    if(key==="FINAL")return["L4","R4"];
+    return null;
+  }
+  function status(key){
+    if(/^L16_/.test(key)||/^R16_/.test(key)){
+      const m=matchup(state,key),teams=m.filter(Boolean);
+      if(teams.length===1)r[key]=teams[0];
+      else if(teams.length===0)delete r[key];
+      else if(r[key]&&!teams.includes(r[key]))delete r[key];
+      return {ready:teams.length<2||!!r[key],team:r[key]||""};
+    }
+    const kids=children(key);
+    if(!kids)return {ready:false,team:""};
+    const a=status(kids[0]),b=status(kids[1]);
+    if(!a.ready||!b.ready)return {ready:false,team:""};
+    const teams=[a.team,b.team].filter(Boolean);
+    if(teams.length===1)r[key]=teams[0];
+    else if(teams.length===0)delete r[key];
+    else if(r[key]&&!teams.includes(r[key]))delete r[key];
+    return {ready:teams.length<2||!!r[key],team:r[key]||""};
+  }
+  status("FINAL");
   return state;
 }
 function rankings(state){
