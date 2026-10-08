@@ -1,9 +1,53 @@
-<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>도랑배 윷놀이 방송화면</title><link rel="stylesheet" href="./common.css"><style>body{overflow:hidden}.page{max-width:none;padding:0}.board-wrap{overflow:hidden}.board{width:100vw;min-width:0;border-radius:0}.broadcast-slot{pointer-events:none}.third-win{color:#ffe6a3!important;text-shadow:0 0 10px rgba(244,190,78,.98),0 1px 2px #000!important}.third-lose{opacity:.25}.sync-overlay{position:fixed;z-index:90;left:50%;top:16px;transform:translateX(-50%);padding:8px 12px;border:1px solid #51445c;border-radius:10px;background:rgba(17,12,24,.92);color:#ddd;font-size:12px;font-weight:900;pointer-events:none}
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>토너먼트 방송화면</title>
+<link rel="stylesheet" href="./common.css">
+<style>
+html,body{width:100%;height:100%;overflow:hidden;background:#07080d}
+.page{max-width:none;padding:0}
+.board-wrap{overflow:hidden}
+.board.generic-board{
+  --accent:#a970ff;--accent-soft:rgba(169,112,255,.18);--accent-line:rgba(185,145,255,.48);
+  width:100vw;min-width:0;border-radius:0;
+  background:
+    radial-gradient(circle at 50% 50%,var(--accent-soft),transparent 26%),
+    linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px),
+    linear-gradient(180deg,#121521 0%,#080a10 58%,#05060a 100%);
+  background-size:auto,48px 48px,48px 48px,auto;
+}
+.board.generic-board[data-theme="blue"]{--accent:#4ea5ff;--accent-soft:rgba(78,165,255,.18);--accent-line:rgba(107,186,255,.48)}
+.board.generic-board[data-theme="red"]{--accent:#ff6178;--accent-soft:rgba(255,97,120,.17);--accent-line:rgba(255,126,145,.48)}
+.board.generic-board[data-theme="gold"]{--accent:#e7bb62;--accent-soft:rgba(231,187,98,.17);--accent-line:rgba(241,202,126,.48)}
+.board.generic-board[data-theme="green"]{--accent:#48cb8b;--accent-soft:rgba(72,203,139,.17);--accent-line:rgba(102,222,163,.48)}
+.event-brand{position:absolute;z-index:8;top:2.4%;left:50%;transform:translateX(-50%);font-size:clamp(8px,.75vw,12px);font-weight:1000;letter-spacing:.28em;color:var(--accent);white-space:nowrap}
+.event-title{position:absolute;z-index:8;top:5.2%;left:50%;transform:translateX(-50%);width:70%;text-align:center;font-size:clamp(22px,2.2vw,40px);line-height:1.05;font-weight:1000;letter-spacing:-.03em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.event-subtitle{position:absolute;z-index:8;top:11%;left:50%;transform:translateX(-50%);width:70%;text-align:center;font-size:clamp(9px,.9vw,15px);font-weight:800;color:#9fa8ba;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.round-label-b{position:absolute;z-index:7;top:18.2%;transform:translateX(-50%);padding:5px 13px;border:1px solid var(--accent-line);border-radius:999px;background:rgba(10,12,18,.82);color:#dfe4ee;font-size:clamp(9px,.9vw,14px);font-weight:1000}
+.final-label-b{position:absolute;z-index:7;top:18%;left:50%;transform:translateX(-50%);color:var(--accent);font-size:clamp(12px,1.15vw,19px);font-weight:1000;letter-spacing:.18em}
+.champion-caption{position:absolute;z-index:7;left:50%;top:52.2%;transform:translateX(-50%);color:#7f899c;font-size:clamp(8px,.72vw,12px);font-weight:1000;letter-spacing:.14em}
+.third-caption{position:absolute;z-index:7;left:50%;top:77%;transform:translateX(-50%);color:#aab2c0;font-size:clamp(9px,.9vw,14px);font-weight:1000}
+.broadcast-lines{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+.broadcast-lines path{fill:none;stroke:var(--accent-line);stroke-width:3}
+.broadcast-slot{pointer-events:none;border:1px solid rgba(255,255,255,.14);border-radius:7px;background:rgba(13,16,24,.88);box-shadow:inset 3px 0 0 var(--accent);text-shadow:none!important;color:#f5f7fb}
+.broadcast-slot:empty{opacity:.34}
+.broadcast-slot.champion-slot{border-color:var(--accent-line);background:linear-gradient(180deg,var(--accent-soft),rgba(14,16,23,.95));box-shadow:0 0 24px var(--accent-soft),inset 0 0 0 1px var(--accent-line);font-size:clamp(11px,1.18vw,19px)}
+.third-win{color:#ffe6a3!important;border-color:#e7bb62!important;box-shadow:inset 3px 0 0 #e7bb62!important}
+.third-lose{opacity:.28}
+.progress-mask{left:auto;right:2.2%;top:3%;width:auto;min-width:150px;height:34px;padding:0 12px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(8,10,15,.78);font-size:clamp(9px,.82vw,13px)}
+.board-version{left:1.3%;bottom:1.2%;color:#778092}
+.sync-overlay{position:fixed;z-index:90;left:50%;top:16px;transform:translateX(-50%);padding:8px 12px;border:1px solid #51445c;border-radius:10px;background:rgba(17,12,24,.92);color:#ddd;font-size:12px;font-weight:900;pointer-events:none}
 .sync-overlay.connected{opacity:0;transition:opacity .8s 1.8s}
 .room-connect{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:#08060c}
 .room-card{width:min(520px,92vw);padding:24px;border:1px solid #5d466f;border-radius:18px;background:#15101f;text-align:center}
 .room-card h2{margin:0 0 10px}
-</style></head><body>
+.podium-wrap{border-color:var(--accent-line)!important}
+</style>
+</head>
+<body>
 <div class="sync-overlay" id="syncStatus">원격 연결 확인 중</div>
 <div class="room-connect" id="roomConnect" style="display:none">
   <div class="room-card">
@@ -11,54 +55,120 @@
     <div class="sub">게임컴 조작화면에서 <b>송출컴 방송링크 복사</b>를 누른 뒤, 그 링크를 송출컴에서 열어줘.<br>별도 연결코드 입력은 필요 없어.</div>
   </div>
 </div>
-<div class="page"><div class="board-wrap"><div class="board" id="board"><div class="progress-mask" id="progress">결과 0 / 8 완료</div><div class="board-version">BROADCAST · v1.1.1</div>
-<div class="podium" id="rankingPopup">
-  <div class="podium-wrap" style="position:relative">
-    <button id="closeRankingPopup" aria-label="순위 팝업 닫기" style="position:absolute;right:14px;top:12px;width:38px;height:38px;border:1px solid #5a4b65;border-radius:50%;background:#211829;color:#fff;font-size:22px;font-weight:900;line-height:1;cursor:pointer">×</button>
-    <div class="podium-title">FINAL RESULT</div>
-    <div class="podium-grid">
-      <div class="podium-card second"><div class="rank">2위</div><div class="podium-team" id="rank2">-</div></div>
-      <div class="podium-card first"><div class="crown">♛</div><div class="rank">1위</div><div class="podium-team" id="rank1">-</div></div>
-      <div class="podium-card third"><div class="rank">3위</div><div class="podium-team" id="rank3">-</div></div>
+
+<div class="page">
+  <div class="board-wrap">
+    <div class="board generic-board" id="board" data-theme="purple">
+      <div class="event-brand" id="eventBrand">TOURNAMENT</div>
+      <div class="event-title" id="eventTitle">토너먼트 대진표</div>
+      <div class="event-subtitle" id="eventSubtitle">16강 토너먼트</div>
+
+      <div class="round-label-b" style="left:10%">16강</div>
+      <div class="round-label-b" style="left:28%">8강</div>
+      <div class="round-label-b" style="left:40%">4강</div>
+      <div class="final-label-b">FINAL</div>
+      <div class="round-label-b" style="left:60%">4강</div>
+      <div class="round-label-b" style="left:72%">8강</div>
+      <div class="round-label-b" style="left:90%">16강</div>
+      <div class="champion-caption">CHAMPION</div>
+      <div class="third-caption">3 · 4위전</div>
+
+      <svg class="broadcast-lines" viewBox="0 0 1536 864" aria-hidden="true">
+        <path d="M240 283 H274 V315 H304"/><path d="M240 341 H274 V315 H304"/>
+        <path d="M240 401 H274 V431 H304"/><path d="M240 459 H274 V431 H304"/>
+        <path d="M240 522 H274 V554 H304"/><path d="M240 581 H274 V554 H304"/>
+        <path d="M240 642 H274 V674 H304"/><path d="M240 700 H274 V674 H304"/>
+        <path d="M395 315 H430 V375 H462"/><path d="M395 431 H430 V375 H462"/>
+        <path d="M395 554 H430 V612 H462"/><path d="M395 674 H430 V612 H462"/>
+        <path d="M558 375 H600 V476 H520"/><path d="M558 612 H600 V476 H520"/>
+        <path d="M610 476 H680 V508"/>
+        <path d="M1303 283 H1262 V315 H1229"/><path d="M1303 341 H1262 V315 H1229"/>
+        <path d="M1303 401 H1262 V431 H1229"/><path d="M1303 459 H1262 V431 H1229"/>
+        <path d="M1303 522 H1262 V554 H1229"/><path d="M1303 581 H1262 V554 H1229"/>
+        <path d="M1303 642 H1262 V674 H1229"/><path d="M1303 700 H1262 V674 H1229"/>
+        <path d="M1138 315 H1105 V375 H1073"/><path d="M1138 431 H1105 V375 H1073"/>
+        <path d="M1138 554 H1105 V612 H1073"/><path d="M1138 674 H1105 V612 H1073"/>
+        <path d="M977 375 H936 V476 H1016"/><path d="M977 612 H936 V476 H1016"/>
+        <path d="M926 476 H856 V508"/>
+      </svg>
+
+      <div class="progress-mask" id="progress">결과 0 / 8 완료</div>
+      <div class="board-version">BROADCAST · v1.2.0</div>
+
+      <div class="podium" id="rankingPopup">
+        <div class="podium-wrap" style="position:relative">
+          <button id="closeRankingPopup" aria-label="순위 팝업 닫기" style="position:absolute;right:14px;top:12px;width:38px;height:38px;border:1px solid #5a4b65;border-radius:50%;background:#211829;color:#fff;font-size:22px;font-weight:900;line-height:1;cursor:pointer">×</button>
+          <div class="podium-title" id="rankingTitle">FINAL RESULT</div>
+          <div class="podium-grid">
+            <div class="podium-card second"><div class="rank">2위</div><div class="podium-team" id="rank2">-</div></div>
+            <div class="podium-card first"><div class="crown">♛</div><div class="rank">1위</div><div class="podium-team" id="rank1">-</div></div>
+            <div class="podium-card third"><div class="rank">3위</div><div class="podium-team" id="rank3">-</div></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div></div></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
-<script src="./shared.js"></script><script>
+<script src="./shared.js"></script>
+<script>
 const remoteRoom=roomFromUrl();
 let state=remoteRoom?blankState():loadState(),lastRankingSignature="";
 const board=document.getElementById("board"),els={};
 const syncStatus=document.getElementById("syncStatus");
-for(const id of Object.keys(SLOT_POSITIONS)){const d=document.createElement("div");d.className="slot broadcast-slot";applyPosition(d,id);board.appendChild(d);els[id]=d;}
+
+for(const id of Object.keys(SLOT_POSITIONS)){
+  const d=document.createElement("div");
+  d.className="slot broadcast-slot"+(id==="CHAMP"?" champion-slot":"");
+  applyPosition(d,id);
+  board.appendChild(d);
+  els[id]=d;
+}
+
 function showRankingPopup(){
   const r=rankings(state);
   if(!r.complete)return;
   document.getElementById("rank1").textContent=r.first;
   document.getElementById("rank2").textContent=r.second;
   document.getElementById("rank3").textContent=r.third;
+  document.getElementById("rankingTitle").textContent=(state.event&&state.event.title?state.event.title:"토너먼트")+" · 최종 순위";
   document.getElementById("rankingPopup").classList.add("show");
 }
-function closeRankingPopup(){
-  document.getElementById("rankingPopup").classList.remove("show");
-}
+function closeRankingPopup(){document.getElementById("rankingPopup").classList.remove("show");}
 document.getElementById("closeRankingPopup").addEventListener("click",closeRankingPopup);
 document.getElementById("rankingPopup").addEventListener("click",e=>{if(e.target.id==="rankingPopup")closeRankingPopup();});
+
 function render(){
- for(const id of Object.keys(SLOT_POSITIONS)){els[id].className="slot broadcast-slot";els[id].textContent=slotTeam(state,id);}
- const third=matchup(state,"THIRD");els.TL.textContent=state.started?(third[0]||""):"";els.TR.textContent=state.started?(third[1]||""):"";
- if(state.started&&state.results.THIRD){if(third[0]===state.results.THIRD){els.TL.textContent="3위 · "+third[0];els.TL.classList.add("third-win");els.TR.classList.add("third-lose");}else if(third[1]===state.results.THIRD){els.TR.textContent="3위 · "+third[1];els.TR.classList.add("third-win");els.TL.classList.add("third-lose");}}
- els.CHAMP.textContent=state.started?(state.results.FINAL||""):"";
- const n=Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length;document.getElementById("progress").textContent="결과 "+n+" / 8 완료";
- const rr=rankings(state);
- const sig=rr.complete?(state.results.FINAL+"|"+state.results.THIRD):"";
- if(rr.complete&&sig!==lastRankingSignature){
-   lastRankingSignature=sig;
-   showRankingPopup();
- }
- if(!rr.complete){
-   closeRankingPopup();
-   lastRankingSignature="";
- }
+  const event=state.event||blankState().event;
+  board.dataset.theme=event.theme||"purple";
+  document.getElementById("eventTitle").textContent=event.title||"토너먼트 대진표";
+  document.getElementById("eventSubtitle").textContent=event.subtitle||"";
+  document.getElementById("eventBrand").textContent=event.brand||"";
+  document.title=(event.title||"토너먼트")+" 방송화면";
+
+  for(const id of Object.keys(SLOT_POSITIONS)){
+    els[id].className="slot broadcast-slot"+(id==="CHAMP"?" champion-slot":"");
+    els[id].textContent=slotTeam(state,id);
+  }
+  const third=matchup(state,"THIRD");
+  els.TL.textContent=state.started?(third[0]||""):"";
+  els.TR.textContent=state.started?(third[1]||""):"";
+  if(state.started&&state.results.THIRD){
+    if(third[0]===state.results.THIRD){
+      els.TL.textContent="3위 · "+third[0];els.TL.classList.add("third-win");els.TR.classList.add("third-lose");
+    }else if(third[1]===state.results.THIRD){
+      els.TR.textContent="3위 · "+third[1];els.TR.classList.add("third-win");els.TL.classList.add("third-lose");
+    }
+  }
+  els.CHAMP.textContent=state.started?(state.results.FINAL||""):"";
+  const n=Object.keys(state.results).filter(k=>k.startsWith("L16_")||k.startsWith("R16_")).length;
+  document.getElementById("progress").textContent="16강 결과 "+n+" / 8";
+
+  const rr=rankings(state);
+  const sig=rr.complete?(state.results.FINAL+"|"+state.results.THIRD):"";
+  if(rr.complete&&sig!==lastRankingSignature){lastRankingSignature=sig;showRankingPopup();}
+  if(!rr.complete){closeRankingPopup();lastRankingSignature="";}
 }
 function setSyncStatus(msg){
   syncStatus.textContent=msg;
@@ -72,4 +182,6 @@ if(remoteRoom){
 }
 if(!remoteRoom)watchState(s=>{state=normalizeState(s);render();});
 render();
-</script></body></html>
+</script>
+</body>
+</html>
