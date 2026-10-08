@@ -1,6 +1,9 @@
-const APP_VERSION="1.0.11";
+const APP_VERSION="1.1.0";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
+const REMOTE_ROOM_KEY="newcatsle_yut_room_v1";
+const REMOTE_PEER_PREFIX="newcatsle-yut-";
+const remoteHostConnections=new Set();
 const DEFAULT_TEAMS=["트슈 · 단솔","니코 · 하윤","듀듀 · 미스","냥코 · 으니","뉴다 · 복실","도랑 · 재욱","아송 · 쫑알","막현 · 퀸주","아깽 · 대휘","키링 · 갑숙","봉구 · 빵지니","난강 · 밍또","유즈 · 성균","건욱 · 키키","액구 · 유성","두링 · 성준"];
 const SLOT_POSITIONS={
 L0:[83,268,157,30],L1:[83,326,157,30],L2:[83,386,157,30],L3:[83,444,157,30],L4:[83,507,157,30],L5:[83,566,157,30],L6:[83,627,157,30],L7:[83,685,157,30],
@@ -23,6 +26,89 @@ function saveState(state){
   state.updatedAt=Date.now();
   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
   if(channel)channel.postMessage(state);
+  for(const conn of remoteHostConnections){
+    if(conn&&conn.open){
+      try{conn.send({type:"state",state});}catch(_){}
+    }
+  }
+}
+function normalizeState(v){
+  const base=blankState();
+  return {...base,...v,roster:Array.isArray(v&&v.roster)&&v.roster.length===16?v.roster:[...DEFAULT_TEAMS],teams:Array.isArray(v&&v.teams)&&v.teams.length===16?v.teams:Array(16).fill(""),results:v&&v.results||{}};
+}
+function sanitizeRoomCode(v){return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8);}
+function makeRoomCode(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let out="";
+  if(window.crypto&&crypto.getRandomValues){
+    const a=new Uint8Array(8);crypto.getRandomValues(a);
+    for(const n of a)out+=chars[n%chars.length];
+  }else{
+    for(let n=0;n<8;n++)out+=chars[Math.floor(Math.random()*chars.length)];
+  }
+  return out;
+}
+function roomFromUrl(){return sanitizeRoomCode(new URLSearchParams(location.search).get("room"));}
+function getOrCreateRoomCode(){
+  const fromUrl=roomFromUrl();
+  if(fromUrl){localStorage.setItem(REMOTE_ROOM_KEY,fromUrl);return fromUrl;}
+  let code=sanitizeRoomCode(localStorage.getItem(REMOTE_ROOM_KEY));
+  if(!code){code=makeRoomCode();localStorage.setItem(REMOTE_ROOM_KEY,code);}
+  return code;
+}
+function broadcastUrlForRoom(room){
+  const u=new URL("./broadcast.html",location.href);
+  u.searchParams.set("room",sanitizeRoomCode(room));
+  return u.href;
+}
+function initRemoteHost(room,onStatus){
+  room=sanitizeRoomCode(room);
+  if(!room){onStatus&&onStatus("연결 코드 없음");return null;}
+  if(typeof Peer==="undefined"){onStatus&&onStatus("원격 연결 모듈 로드 실패");return null;}
+  const peer=new Peer(REMOTE_PEER_PREFIX+room);
+  peer.on("open",()=>onStatus&&onStatus("송출컴 연결 대기"));
+  peer.on("connection",conn=>{
+    remoteHostConnections.add(conn);
+    const sendCurrent=()=>{try{conn.send({type:"state",state:loadState()});}catch(_){}};
+    conn.on("open",()=>{onStatus&&onStatus("송출컴 연결됨");sendCurrent();});
+    conn.on("close",()=>{remoteHostConnections.delete(conn);onStatus&&onStatus("송출컴 연결 끊김 · 재연결 대기");});
+    conn.on("error",()=>{remoteHostConnections.delete(conn);onStatus&&onStatus("송출컴 연결 오류");});
+  });
+  peer.on("error",err=>onStatus&&onStatus(err&&err.type==="unavailable-id"?"같은 연결 코드가 이미 사용 중":"원격 연결 오류"));
+  peer.on("disconnected",()=>onStatus&&onStatus("중계 서버 재연결 중"));
+  return peer;
+}
+function initRemoteClient(room,onState,onStatus){
+  room=sanitizeRoomCode(room);
+  if(!room){onStatus&&onStatus("연결 코드를 입력해");return null;}
+  if(typeof Peer==="undefined"){onStatus&&onStatus("원격 연결 모듈 로드 실패");return null;}
+  let peer=new Peer(),conn=null,retryTimer=null;
+  const schedule=()=>{
+    clearTimeout(retryTimer);
+    retryTimer=setTimeout(()=>{if(peer&&!peer.destroyed&&peer.open&&(!conn||!conn.open))connect();},2000);
+  };
+  const connect=()=>{
+    if(!peer||peer.destroyed||!peer.open||conn&&conn.open)return;
+    onStatus&&onStatus("게임컴 연결 중");
+    try{
+      conn=peer.connect(REMOTE_PEER_PREFIX+room,{reliable:true});
+      conn.on("open",()=>onStatus&&onStatus("게임컴 연결됨"));
+      conn.on("data",msg=>{
+        if(msg&&msg.type==="state"&&msg.state){
+          const next=normalizeState(msg.state);
+          try{localStorage.setItem(STORAGE_KEY,JSON.stringify(next));}catch(_){}
+          onState&&onState(next);
+        }
+      });
+      conn.on("close",()=>{onStatus&&onStatus("연결 끊김 · 재연결 중");schedule();});
+      conn.on("error",()=>{onStatus&&onStatus("연결 오류 · 재연결 중");schedule();});
+    }catch(_){schedule();}
+  };
+  peer.on("open",connect);
+  peer.on("disconnected",()=>{onStatus&&onStatus("중계 서버 재연결 중");try{peer.reconnect();}catch(_){}});
+  peer.on("error",()=>{onStatus&&onStatus("게임컴 찾는 중");schedule();});
+  window.addEventListener("online",schedule);
+  return peer;
 }
 function watchState(cb){
   window.addEventListener("storage",e=>{if(e.key===STORAGE_KEY&&e.newValue){try{cb(JSON.parse(e.newValue));}catch(_){}}});
