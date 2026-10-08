@@ -1,4 +1,4 @@
-const APP_VERSION="1.1.0";
+const APP_VERSION="1.1.1";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const REMOTE_ROOM_KEY="newcatsle_yut_room_v1";
@@ -63,7 +63,7 @@ function broadcastUrlForRoom(room){
 }
 function initRemoteHost(room,onStatus){
   room=sanitizeRoomCode(room);
-  if(!room){onStatus&&onStatus("연결 코드 없음");return null;}
+  if(!room){onStatus&&onStatus("연결 정보 없음");return null;}
   if(typeof Peer==="undefined"){onStatus&&onStatus("원격 연결 모듈 로드 실패");return null;}
   const peer=new Peer(REMOTE_PEER_PREFIX+room);
   peer.on("open",()=>onStatus&&onStatus("송출컴 연결 대기"));
@@ -74,13 +74,13 @@ function initRemoteHost(room,onStatus){
     conn.on("close",()=>{remoteHostConnections.delete(conn);onStatus&&onStatus("송출컴 연결 끊김 · 재연결 대기");});
     conn.on("error",()=>{remoteHostConnections.delete(conn);onStatus&&onStatus("송출컴 연결 오류");});
   });
-  peer.on("error",err=>onStatus&&onStatus(err&&err.type==="unavailable-id"?"같은 연결 코드가 이미 사용 중":"원격 연결 오류"));
+  peer.on("error",err=>onStatus&&onStatus(err&&err.type==="unavailable-id"?"같은 연결이 이미 사용 중":"원격 연결 오류"));
   peer.on("disconnected",()=>onStatus&&onStatus("중계 서버 재연결 중"));
   return peer;
 }
 function initRemoteClient(room,onState,onStatus){
   room=sanitizeRoomCode(room);
-  if(!room){onStatus&&onStatus("연결 코드를 입력해");return null;}
+  if(!room){onStatus&&onStatus("연결 정보 없음");return null;}
   if(typeof Peer==="undefined"){onStatus&&onStatus("원격 연결 모듈 로드 실패");return null;}
   let peer=new Peer(),conn=null,retryTimer=null;
   const schedule=()=>{
