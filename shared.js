@@ -1,4 +1,4 @@
-const APP_VERSION="1.2.0";
+const APP_VERSION="1.2.1";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const REMOTE_ROOM_KEY="newcatsle_yut_room_v1";
@@ -184,10 +184,10 @@ function rankings(state){
   return {first,second,third,complete:!!(first&&second&&third)};
 }
 function slotTeam(state,id){
-  if(!state.started)return "";
   const r=state.results,t=state.teams;
   if(/^L\d$/.test(id))return t[+id.slice(1)]||"";
   if(/^R\d$/.test(id))return t[8+(+id.slice(1))]||"";
+  if(!state.started)return "";
   if(/^LQ\d$/.test(id))return r["L16_"+(+id.slice(2))]||"";
   if(/^RQ\d$/.test(id))return r["R16_"+(+id.slice(2))]||"";
   if(id==="LS0")return r.L8_0||""; if(id==="LS1")return r.L8_1||"";
