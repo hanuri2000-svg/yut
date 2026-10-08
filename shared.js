@@ -1,4 +1,4 @@
-const APP_VERSION="1.2.2";
+const APP_VERSION="1.2.3";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const REMOTE_ROOM_KEY="newcatsle_yut_room_v1";
