@@ -1,4 +1,4 @@
-const APP_VERSION="1.1.1";
+const APP_VERSION="1.2.0";
 const STORAGE_KEY="newcatsle_yut_final_v1";
 const CHANNEL_NAME="newcatsle_yut_channel_v1";
 const REMOTE_ROOM_KEY="newcatsle_yut_room_v1";
@@ -13,11 +13,11 @@ RQ0:[1138,301,91,28],RQ1:[1138,417,91,28],RQ2:[1138,540,91,28],RQ3:[1138,660,91,
 LS0:[462,361,96,29],LS1:[462,598,96,29],RS0:[977,361,96,29],RS1:[977,598,96,29],
 LF:[520,461,90,30],RF:[926,461,90,30],CHAMP:[680,489,176,38],TL:[566,719,142,31],TR:[824,719,142,31]
 };
-function blankState(){return {roster:[...DEFAULT_TEAMS],teams:Array(16).fill(""),started:false,results:{},podiumNonce:0,updatedAt:Date.now()};}
+function blankState(){return {event:{title:"토너먼트 대진표",subtitle:"16강 토너먼트",brand:"TOURNAMENT",theme:"purple"},roster:[...DEFAULT_TEAMS],teams:Array(16).fill(""),started:false,results:{},podiumNonce:0,updatedAt:Date.now()};}
 function loadState(){
   try{
     const v=JSON.parse(localStorage.getItem(STORAGE_KEY)||"null");
-    if(v&&Array.isArray(v.teams)&&v.teams.length===16){const base=blankState();return {...base,...v,roster:Array.isArray(v.roster)&&v.roster.length===16?v.roster:[...DEFAULT_TEAMS],results:v.results||{}};}
+    if(v&&Array.isArray(v.teams)&&v.teams.length===16){const base=blankState();return {...base,...v,event:{...base.event,...(v.event||{})},roster:Array.isArray(v.roster)&&v.roster.length===16?v.roster:[...DEFAULT_TEAMS],results:v.results||{}};}
   }catch(e){}
   return blankState();
 }
@@ -34,7 +34,7 @@ function saveState(state){
 }
 function normalizeState(v){
   const base=blankState();
-  return {...base,...v,roster:Array.isArray(v&&v.roster)&&v.roster.length===16?v.roster:[...DEFAULT_TEAMS],teams:Array.isArray(v&&v.teams)&&v.teams.length===16?v.teams:Array(16).fill(""),results:v&&v.results||{}};
+  return {...base,...v,event:{...base.event,...(v&&v.event||{})},roster:Array.isArray(v&&v.roster)&&v.roster.length===16?v.roster:[...DEFAULT_TEAMS],teams:Array.isArray(v&&v.teams)&&v.teams.length===16?v.teams:Array(16).fill(""),results:v&&v.results||{}};
 }
 function sanitizeRoomCode(v){return String(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,8);}
 function makeRoomCode(){
