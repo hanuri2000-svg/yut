@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>도랑배 윷놀이 조작화면</title>
+<title>토너먼트 조작화면</title>
 <link rel="stylesheet" href="./common.css">
 <style>
 body{background:#09070e}
@@ -99,19 +99,26 @@ body{background:#09070e}
 .remote-panel{max-width:1536px;margin:0 auto 10px;padding:10px 12px;border:1px solid #3e3349;border-radius:12px;background:#120e18;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .remote-status{font-size:12px;color:#bfaed0}
 @media(max-width:760px){.remote-panel .btn{flex:1 1 auto}}
+
+.event-editor{width:min(620px,96vw)}
+.event-form{display:grid;gap:12px}
+.event-field{display:grid;gap:6px}
+.event-field label{font-size:12px;color:#bfaed0;font-weight:900}
+.event-input,.event-select{width:100%;min-height:46px;border:1px solid #44384e;border-radius:10px;background:#17121f;color:#fff;padding:0 12px;font-size:16px;font-weight:800;outline:none}
+.event-input:focus,.event-select:focus{border-color:#8c55bd;box-shadow:0 0 0 2px rgba(177,108,255,.12)}
 </style>
 </head>
 <body>
 <div class="page">
   <div class="toolbar">
     <div>
-      <div class="title">도랑배 윷놀이 조작화면</div>
+      <div class="title">토너먼트 조작화면</div>
       <div class="sub" id="guide">빈 16강 칸을 눌러 팀을 선택해. 등록된 팀을 모두 넣으면 시작할 수 있어.</div>
     </div>
     <div>
-      <div class="version">v1.1.1</div>
+      <div class="version">v1.2.0</div>
       <div class="actions" style="margin-top:6px">
-        <button class="btn" id="openBroadcast">방송화면 열기</button><button class="btn" id="editRoster">팀 명단 수정</button>
+        <button class="btn" id="openBroadcast">방송화면 열기</button><button class="btn" id="editEvent">대회 설정</button><button class="btn" id="editRoster">팀 명단 수정</button>
         <button class="btn" id="undo">직전 결과 취소</button>
         
         <button class="btn primary" id="start">시작</button>
@@ -128,10 +135,10 @@ body{background:#09070e}
   </div>
 <div id="usageGuide" style="max-width:1536px;margin:0 auto 10px;padding:10px 12px;border:1px solid #3e3349;border-radius:12px;background:#120e18;color:#d7cde1;font-size:13px;line-height:1.6">
   <b style="color:#fff">사용 방법</b><br>
-  ① <b>팀 명단:</b> 필요하면 <b>팀 명단 수정</b>에서 16개 팀 이름 변경<br>  ② <b>대진 설정:</b> 시작 전 빈 16강 칸을 클릭 → 팀 선택 → 등록된 팀 모두 배치<br>
-  ③ <b>경기 시작:</b> 등록된 팀 배치 후 <b>시작</b> 버튼 클릭 · 빈 대진은 부전승 자동 처리<br>
-  ④ <b>승자 표시:</b> 경기 종료 후 대진표에서 <b>이긴 팀 이름을 클릭</b> → 다음 라운드 자동 진출<br>
-  ⑤ 잘못 눌렀으면 <b>직전 결과 취소</b> 사용<br>  ⑥ <b>송출컴 분리:</b> <b>송출컴 방송링크 복사</b> → 송출컴에서 그 링크 열기 → 자동 연결
+  ① <b>대회 설정:</b> 대회명 · 부제 · 브랜드 · 방송 테마 설정<br>  ② <b>팀 명단:</b> 필요하면 <b>팀 명단 수정</b>에서 참가팀 변경<br>  ③ <b>대진 설정:</b> 시작 전 빈 16강 칸을 클릭 → 팀 선택 → 등록된 팀 모두 배치<br>
+  ④ <b>경기 시작:</b> 등록된 팀 배치 후 <b>시작</b> 버튼 클릭 · 빈 대진은 부전승 자동 처리<br>
+  ⑤ <b>승자 표시:</b> 경기 종료 후 대진표에서 <b>이긴 팀 이름을 클릭</b> → 다음 라운드 자동 진출<br>
+  ⑥ 잘못 눌렀으면 <b>직전 결과 취소</b> 사용<br>  ⑦ <b>송출컴 분리:</b> <b>송출컴 방송링크 복사</b> → 송출컴에서 그 링크 열기 → 자동 연결
 </div>
 
   <div class="board-wrap">
@@ -167,7 +174,7 @@ body{background:#09070e}
       </svg>
 
       <div class="progress-mask" id="progress">결과 0 / 8 완료</div>
-      <div class="board-version">CONTROL · v1.1.1</div>
+      <div class="board-version">CONTROL · v1.2.0</div>
     </div>
   </div>
 </div>
@@ -184,6 +191,35 @@ body{background:#09070e}
     <div class="picker-grid" id="pickerGrid"></div>
     <div class="actions" style="margin-top:10px">
       <button class="btn" id="clearSlot">이 칸 비우기</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="eventModal">
+  <div class="picker event-editor">
+    <div class="picker-head">
+      <div>
+        <b>대회 설정</b>
+        <div class="sub">대회가 바뀔 때 여기만 수정하면 방송화면 전체가 자동으로 바뀌어.</div>
+      </div>
+      <button class="btn" id="closeEvent">닫기</button>
+    </div>
+    <div class="event-form">
+      <div class="event-field"><label for="eventTitle">대회명</label><input class="event-input" id="eventTitle" maxlength="40" placeholder="예: NEWCATSLE 윷놀이대회"></div>
+      <div class="event-field"><label for="eventSubtitle">부제 / 주최 / 설명</label><input class="event-input" id="eventSubtitle" maxlength="60" placeholder="예: NEWCATSLE × 뉴엔터"></div>
+      <div class="event-field"><label for="eventBrand">상단 브랜드 문구</label><input class="event-input" id="eventBrand" maxlength="24" placeholder="예: NEWCATSLE"></div>
+      <div class="event-field"><label for="eventTheme">방송화면 테마</label>
+        <select class="event-select" id="eventTheme">
+          <option value="purple">퍼플</option>
+          <option value="blue">블루</option>
+          <option value="red">레드</option>
+          <option value="gold">골드</option>
+          <option value="green">그린</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions" style="margin-top:14px">
+      <button class="btn primary" id="saveEvent">대회 설정 저장</button>
     </div>
   </div>
 </div>
@@ -254,6 +290,27 @@ function openPicker(index){
   document.getElementById("modal").classList.add("show");
 }
 
+function openEventEditor(){
+  const e=state.event||blankState().event;
+  document.getElementById("eventTitle").value=e.title||"";
+  document.getElementById("eventSubtitle").value=e.subtitle||"";
+  document.getElementById("eventBrand").value=e.brand||"";
+  document.getElementById("eventTheme").value=e.theme||"purple";
+  document.getElementById("eventModal").classList.add("show");
+}
+function closeEventEditor(){document.getElementById("eventModal").classList.remove("show");}
+function saveEventEditor(){
+  const title=document.getElementById("eventTitle").value.trim()||"토너먼트 대진표";
+  state.event={
+    title,
+    subtitle:document.getElementById("eventSubtitle").value.trim(),
+    brand:document.getElementById("eventBrand").value.trim(),
+    theme:document.getElementById("eventTheme").value||"purple"
+  };
+  saveState(state);
+  closeEventEditor();
+  render();
+}
 function openRosterEditor(){
   if(state.started)return;
   const g=document.getElementById("rosterGrid");
@@ -334,6 +391,7 @@ function render(){
   document.getElementById("start").disabled=state.started||activeTeams<2||selected!==activeTeams;
   document.getElementById("undo").disabled=!state.started||history.length===0;
   document.getElementById("editRoster").disabled=state.started;
+  document.querySelector(".title").textContent=(state.event&&state.event.title?state.event.title:"토너먼트")+" · 조작화면";
 
   document.getElementById("guide").textContent=state.started
     ?"끝난 경기에서 이긴 팀 이름을 대진표에서 클릭하면 자동 진출해."
@@ -396,7 +454,11 @@ document.getElementById("start").onclick=()=>{
 };
 
 document.getElementById("reset").onclick=()=>{
+  const keepRoster=[...state.roster];
+  const keepEvent={...(state.event||blankState().event)};
   state=blankState();
+  state.roster=keepRoster;
+  state.event=keepEvent;
   history=[];
   saveState(state);
   render();
@@ -409,6 +471,10 @@ document.getElementById("undo").onclick=()=>{
   render();
 };
 
+document.getElementById("editEvent").onclick=openEventEditor;
+document.getElementById("closeEvent").onclick=closeEventEditor;
+document.getElementById("eventModal").addEventListener("click",e=>{if(e.target.id==="eventModal")closeEventEditor();});
+document.getElementById("saveEvent").onclick=saveEventEditor;
 document.getElementById("editRoster").onclick=openRosterEditor;
 document.getElementById("closeRoster").onclick=closeRosterEditor;
 document.getElementById("rosterModal").addEventListener("click",e=>{if(e.target.id==="rosterModal")closeRosterEditor();});
